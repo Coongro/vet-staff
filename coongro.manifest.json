@@ -1,0 +1,113 @@
+{
+  "id": "vet-staff",
+  "version": "0.1.0",
+  "apiVersion": "2.0",
+  "assets": {
+    "styles": [
+      "./dist/assets/tailwind.css",
+      "./dist/assets/fontawesome/css/all.min.css"
+    ]
+  },
+  "contributes": {
+    "menus": [
+      {
+        "path": "Personal",
+        "icon": "assets/icons/staff.svg",
+        "color": "#8B5CF6"
+      },
+      {
+        "path": "Personal/Profesionales",
+        "order": 1,
+        "viewId": "vet-staff.profesionales.open"
+      }
+    ],
+    "views": [
+      {
+        "id": "vet-staff.profesionales.open",
+        "title": "Profesionales",
+        "component": "./dist/views/profesionales/index.js",
+        "export": "ProfesionalesView"
+      },
+      {
+        "id": "vet-staff.profesionales-detail.open",
+        "title": "Profesional",
+        "component": "./dist/views/profesionales-detail/index.js",
+        "export": "ProfesionalesDetailView"
+      }
+    ],
+    "repositories": [
+      {
+        "module": "./dist/repositories/vet-professional.repository.js",
+        "export": "VetProfessionalRepository",
+        "prefix": "vet-staff.professionals"
+      }
+    ],
+    "settings": {
+      "groups": [
+        {
+          "id": "vet-staff",
+          "label": "Personal Veterinario",
+          "order": 50
+        }
+      ],
+      "pages": [
+        {
+          "id": "vet-staff.fields",
+          "group": "vet-staff",
+          "label": "Campos visibles",
+          "icon": "assets/icons/general.svg",
+          "order": 10
+        }
+      ],
+      "sections": [
+        {
+          "id": "vet-staff.fields.main",
+          "page": "vet-staff.fields",
+          "label": "Campos del profesional",
+          "order": 10,
+          "items": [
+            {
+              "key": "vet-staff.fields.license",
+              "type": "boolean",
+              "label": "Matricula y colegio emisor",
+              "description": "Mostrar campos de matricula profesional y colegio emisor en formularios, tabla y detalle",
+              "default": true,
+              "tags": [
+                "vet-staff",
+                "campos",
+                "matricula",
+                "colegio",
+                "license"
+              ]
+            },
+            {
+              "key": "vet-staff.fields.specialty",
+              "type": "boolean",
+              "label": "Especialidad",
+              "description": "Mostrar campo de especialidad veterinaria en formularios, tabla y detalle",
+              "default": true,
+              "tags": [
+                "vet-staff",
+                "campos",
+                "especialidad",
+                "specialty"
+              ]
+            },
+            {
+              "key": "vet-staff.fields.senasa",
+              "type": "boolean",
+              "label": "SENASA",
+              "description": "Mostrar campo de acreditacion SENASA en formularios y detalle",
+              "default": false,
+              "tags": [
+                "vet-staff",
+                "campos",
+                "senasa"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

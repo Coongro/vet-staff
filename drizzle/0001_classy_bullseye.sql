@@ -1,0 +1,1 @@
+ALTER TABLE "module_vet_staff_vet_professionals" ALTER COLUMN "id" SET DEFAULT gen_random_uuid();
