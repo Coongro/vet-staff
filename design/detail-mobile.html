@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Veterinario — Detalle Mobile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cg-bg: #F6F5F1;
+      --cg-surface: #FFFFFF;
+      --cg-border: #E8E6E1;
+      --cg-text: #1A1918;
+      --cg-text-muted: #9B9893;
+      --cg-accent: #F5A800;
+      --cg-accent-hover: #E09800;
+      --cg-gold-lt: #FFFBF0;
+      --cg-danger: #DC2626;
+      --cg-danger-bg: #FEF2F2;
+      --cg-success: #16A34A;
+      --cg-success-bg: #F0FDF4;
+      --cg-warning: #F59E0B;
+      --cg-r-md: 8px;
+      --cg-r-lg: 12px;
+      --cg-r-xl: 18px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: var(--cg-bg);
+      color: var(--cg-text);
+      max-width: 420px;
+      margin: 0 auto;
+      /* Espacio para sticky footer */
+      padding-bottom: 80px;
+    }
+    h1, h2, h3 { font-family: 'Noto Serif JP', serif; }
+
+    /* ===== Header ===== */
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid var(--cg-border);
+      background: var(--cg-surface);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .btn-back {
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--cg-border);
+      background: var(--cg-surface);
+      border-radius: var(--cg-r-md);
+      cursor: pointer;
+      font-size: 16px;
+      color: var(--cg-text-muted);
+      flex-shrink: 0;
+    }
+    .header-info { flex: 1; min-width: 0; }
+    .page-title {
+      font-size: 17px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+      font-size: 12px;
+      color: var(--cg-text-muted);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+    .status-badge.active { background: var(--cg-success-bg); color: var(--cg-success); }
+    .status-badge.inactive { background: #F5F5F4; color: var(--cg-text-muted); }
+    .status-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+    }
+    .status-badge.active .status-dot { background: var(--cg-success); }
+    .status-badge.inactive .status-dot { background: var(--cg-text-muted); }
+
+    .btn-more {
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--cg-border);
+      background: var(--cg-surface);
+      border-radius: var(--cg-r-md);
+      cursor: pointer;
+      font-size: 16px;
+      color: var(--cg-text-muted);
+      flex-shrink: 0;
+    }
+
+    /* ===== Content ===== */
+    .content { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+    /* ===== Card base ===== */
+    .card {
+      background: var(--cg-surface);
+      border: 1px solid var(--cg-border);
+      border-radius: var(--cg-r-xl);
+      overflow: hidden;
+    }
+    .card-body { padding: 16px; }
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .section-icon { color: var(--cg-text-muted); font-size: 13px; }
+
+    /* ===== Profile card ===== */
+    .profile-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+    }
+    .avatar-md {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      font-weight: 600;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .avatar-md.blue { background: #3B82F6; }
+    .profile-info { flex: 1; min-width: 0; }
+    .profile-name {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .profile-role {
+      font-size: 12px;
+      color: var(--cg-text-muted);
+      margin-top: 2px;
+    }
+
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 16px;
+      border-top: 1px solid var(--cg-border);
+      font-size: 13px;
+    }
+    .contact-icon { color: var(--cg-text-muted); font-size: 13px; flex-shrink: 0; }
+    .contact-value { flex: 1; min-width: 0; }
+    .contact-value a { color: var(--cg-accent); text-decoration: none; }
+
+    /* ===== Bento (stacked on mobile) ===== */
+    .bento-list {
+      border-top: 1px solid var(--cg-border);
+    }
+    .bento-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 12px 16px;
+    }
+    .bento-row + .bento-row {
+      border-top: 1px solid var(--cg-border);
+    }
+    .bento-label {
+      font-size: 12px;
+      color: var(--cg-text-muted);
+      flex-shrink: 0;
+    }
+    .bento-value {
+      font-size: 14px;
+      font-weight: 500;
+      text-align: right;
+      color: var(--cg-text);
+    }
+    .bento-value.mono {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 13px;
+    }
+    .bento-value.muted {
+      color: var(--cg-text-muted);
+      font-weight: 400;
+      font-size: 13px;
+    }
+
+    /* ===== Specialty tags ===== */
+    .specialty-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .specialty-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--cg-gold-lt);
+      color: #92600A;
+    }
+
+    /* ===== Dates ===== */
+    .dates-section {
+      padding: 12px 16px;
+      border-top: 1px solid var(--cg-border);
+      font-size: 11px;
+      color: var(--cg-text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .date-item { display: flex; align-items: center; gap: 5px; }
+
+    /* ===== Sticky footer ===== */
+    .sticky-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-width: 420px;
+      margin: 0 auto;
+      background: var(--cg-surface);
+      border-top: 1px solid var(--cg-border);
+      padding: 12px 16px;
+      display: flex;
+      gap: 10px;
+      z-index: 10;
+    }
+    .btn-primary {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px 16px;
+      background: var(--cg-accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--cg-r-md);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      min-height: 44px;
+    }
+    .btn-outline {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px 16px;
+      border: 1px solid var(--cg-border);
+      background: var(--cg-surface);
+      border-radius: var(--cg-r-md);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--cg-text);
+      min-height: 44px;
+    }
+
+    /* ===== Context menu (more options) ===== */
+    .context-menu {
+      position: absolute;
+      top: 60px;
+      right: 16px;
+      background: var(--cg-surface);
+      border: 1px solid var(--cg-border);
+      border-radius: var(--cg-r-lg);
+      padding: 4px;
+      min-width: 180px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      z-index: 20;
+    }
+    .context-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: var(--cg-r-md);
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      color: var(--cg-text);
+    }
+    .context-item:hover { background: #F0EFEB; }
+    .context-item.danger { color: var(--cg-danger); }
+    .context-item.danger:hover { background: var(--cg-danger-bg); }
+    .context-icon { font-size: 14px; }
+
+    /* ===== Delete confirmation (mobile) ===== */
+    .delete-confirm {
+      background: var(--cg-danger-bg);
+      border: 1px solid #FECACA;
+      border-radius: var(--cg-r-lg);
+      padding: 14px;
+    }
+    .delete-confirm-text {
+      font-size: 13px;
+      color: var(--cg-danger);
+      margin-bottom: 12px;
+    }
+    .delete-confirm-text strong { font-weight: 600; }
+    .delete-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-danger {
+      flex: 1;
+      padding: 10px;
+      background: var(--cg-danger);
+      color: #fff;
+      border: none;
+      border-radius: var(--cg-r-md);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      min-height: 44px;
+    }
+    .btn-cancel-sm {
+      flex: 1;
+      padding: 10px;
+      background: transparent;
+      color: var(--cg-text-muted);
+      border: 1px solid var(--cg-border);
+      border-radius: var(--cg-r-md);
+      font-size: 13px;
+      cursor: pointer;
+      min-height: 44px;
+    }
+
+    /* ===== Notes empty ===== */
+    .notes-empty {
+      padding: 24px 16px;
+      text-align: center;
+      color: var(--cg-text-muted);
+      font-size: 12px;
+    }
+    .notes-empty-icon { font-size: 20px; margin-bottom: 6px; opacity: 0.5; }
+
+    /* ===== Skeleton ===== */
+    @keyframes shimmer {
+      0% { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #EEECE7 25%, #F5F3EE 50%, #EEECE7 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.5s ease-in-out infinite;
+      border-radius: var(--cg-r-md);
+    }
+    .skel-circle { border-radius: 50%; }
+    .skel-line { height: 14px; }
+    .skel-line.short { width: 60%; }
+    .skel-line.tiny { width: 40%; height: 12px; }
+    .skel-tag { width: 90px; height: 24px; border-radius: 12px; }
+    .skel-badge { width: 65px; height: 22px; border-radius: 10px; }
+
+    .skeleton-section { margin-top: 32px; border-top: 2px dashed var(--cg-border); padding-top: 24px; }
+    .skeleton-label { font-size: 13px; font-weight: 500; color: var(--cg-text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; padding: 0 16px; }
+
+    .state-section { margin-top: 32px; border-top: 2px dashed var(--cg-border); padding-top: 24px; }
+    .state-label { font-size: 13px; font-weight: 500; color: var(--cg-text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; padding: 0 16px; }
+  </style>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <div class="page-header">
+    <button class="btn-back">[icon:ArrowLeft]</button>
+    <div class="header-info">
+      <div class="page-title">Dra. Maria Garcia</div>
+      <div class="header-meta">
+        <span class="status-badge active"><span class="status-dot"></span> Activo</span>
+        <span>&middot;</span>
+        <span>MP 12345</span>
+      </div>
+    </div>
+    <button class="btn-more">[icon:MoreVertical]</button>
+  </div>
+
+  <!-- ===== CONTENT ===== -->
+  <div class="content">
+
+    <!-- Card: Perfil + contacto -->
+    <div class="card">
+      <div class="profile-card">
+        <div class="avatar-md blue">MG</div>
+        <div class="profile-info">
+          <div class="profile-name">Dra. Maria Garcia</div>
+          <div class="profile-role">Veterinaria Senior</div>
+        </div>
+      </div>
+      <div class="contact-row">
+        <span class="contact-icon">[icon:Mail]</span>
+        <div class="contact-value"><a href="#">maria.garcia@email.com</a></div>
+      </div>
+      <div class="contact-row">
+        <span class="contact-icon">[icon:Phone]</span>
+        <div class="contact-value">+54 11 4567-8901</div>
+      </div>
+    </div>
+
+    <!-- Card: Datos profesionales -->
+    <div class="card">
+      <div class="card-body" style="padding-bottom:0;">
+        <div class="section-title">
+          <span class="section-icon">[icon:Stethoscope]</span>
+          Datos profesionales
+        </div>
+      </div>
+      <div class="bento-list">
+        <div class="bento-row">
+          <span class="bento-label">Matricula</span>
+          <span class="bento-value mono">MP 12345</span>
+        </div>
+        <div class="bento-row">
+          <span class="bento-label">Colegio emisor</span>
+          <span class="bento-value">CVPBA</span>
+        </div>
+        <div class="bento-row">
+          <span class="bento-label">SENASA</span>
+          <span class="bento-value mono">12345678</span>
+        </div>
+        <div class="bento-row">
+          <span class="bento-label">Estado</span>
+          <span class="status-badge active"><span class="status-dot"></span> Activo</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card: Especialidades -->
+    <div class="card">
+      <div class="card-body" style="padding-bottom:0;">
+        <div class="section-title">
+          <span class="section-icon">[icon:Award]</span>
+          Especialidades
+        </div>
+      </div>
+      <div style="padding:0 16px 16px;">
+        <div class="specialty-tags">
+          <span class="specialty-tag">Clinica Medica</span>
+          <span class="specialty-tag">Cirugia</span>
+        </div>
+      </div>
+      <div class="dates-section">
+        <div class="date-item">[icon:Clock] Registrado: 4 Abr 2026</div>
+        <div class="date-item">[icon:RefreshCw] Actualizado: 4 Abr 2026</div>
+      </div>
+    </div>
+
+    <!-- Card: Notas -->
+    <div class="card">
+      <div class="card-body" style="padding-bottom:0;">
+        <div class="section-title">
+          <span class="section-icon">[icon:FileText]</span>
+          Notas
+        </div>
+      </div>
+      <div class="notes-empty">
+        <div class="notes-empty-icon">[icon:StickyNote]</div>
+        <div>Sin notas registradas</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== STICKY FOOTER ===== -->
+  <div class="sticky-footer">
+    <button class="btn-outline">[icon:Pencil] Editar</button>
+  </div>
+
+  <!-- ==================== ESTADO: Menu contextual ==================== -->
+  <div class="state-section">
+    <div class="state-label">Estado: Menu contextual (al tocar "...")</div>
+
+    <div style="position:relative;padding:0 16px;">
+      <div class="context-menu" style="position:relative;top:0;right:0;">
+        <button class="context-item">
+          <span class="context-icon">[icon:Pencil]</span>
+          Editar profesional
+        </button>
+        <button class="context-item">
+          <span class="context-icon">[icon:ToggleLeft]</span>
+          Desactivar
+        </button>
+        <button class="context-item danger">
+          <span class="context-icon">[icon:Trash2]</span>
+          Eliminar profesional
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ESTADO: Confirmacion de eliminacion ==================== -->
+  <div class="state-section">
+    <div class="state-label">Estado: Confirmacion de eliminacion</div>
+
+    <div class="content" style="padding-top:0;">
+      <div class="delete-confirm">
+        <div class="delete-confirm-text">
+          <strong>Eliminar a Dra. Maria Garcia?</strong><br>
+          Se eliminara el registro profesional. El contacto y empleado se mantienen.
+        </div>
+        <div class="delete-actions">
+          <button class="btn-cancel-sm">Cancelar</button>
+          <button class="btn-danger">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ESTADO: Profesional inactivo ==================== -->
+  <div class="state-section">
+    <div class="state-label">Estado: Profesional inactivo</div>
+
+    <div class="page-header" style="position:relative;">
+      <button class="btn-back">[icon:ArrowLeft]</button>
+      <div class="header-info">
+        <div class="page-title" style="color:var(--cg-text-muted);">Dra. Laura Fernandez</div>
+        <div class="header-meta">
+          <span class="status-badge inactive"><span class="status-dot"></span> Inactivo</span>
+          <span>&middot;</span>
+          <span style="text-decoration:line-through;">MP 77889</span>
+        </div>
+      </div>
+      <button class="btn-more">[icon:MoreVertical]</button>
+    </div>
+  </div>
+
+  <!-- ==================== SKELETON STATE ==================== -->
+  <div class="skeleton-section">
+    <div class="skeleton-label">Estado: Cargando</div>
+
+    <div class="content" style="padding-top:0;">
+      <!-- Profile skeleton -->
+      <div class="card">
+        <div class="profile-card">
+          <div class="skeleton skel-circle" style="width:56px;height:56px;"></div>
+          <div class="profile-info">
+            <div class="skeleton skel-line" style="width:140px;margin-bottom:6px;"></div>
+            <div class="skeleton skel-line tiny" style="width:80px;"></div>
+          </div>
+        </div>
+        <div class="contact-row">
+          <div class="skeleton skel-circle" style="width:13px;height:13px;"></div>
+          <div class="skeleton skel-line short"></div>
+        </div>
+        <div class="contact-row">
+          <div class="skeleton skel-circle" style="width:13px;height:13px;"></div>
+          <div class="skeleton skel-line short"></div>
+        </div>
+      </div>
+
+      <!-- Professional data skeleton -->
+      <div class="card">
+        <div class="card-body" style="padding-bottom:0;">
+          <div class="section-title">
+            <span class="section-icon">[icon:Stethoscope]</span>
+            Datos profesionales
+          </div>
+        </div>
+        <div class="bento-list">
+          <div class="bento-row">
+            <div class="skeleton skel-line tiny"></div>
+            <div class="skeleton skel-line" style="width:80px;"></div>
+          </div>
+          <div class="bento-row">
+            <div class="skeleton skel-line tiny"></div>
+            <div class="skeleton skel-line" style="width:60px;"></div>
+          </div>
+          <div class="bento-row">
+            <div class="skeleton skel-line tiny"></div>
+            <div class="skeleton skel-line" style="width:70px;"></div>
+          </div>
+          <div class="bento-row">
+            <div class="skeleton skel-line tiny"></div>
+            <div class="skeleton skel-badge"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Specialties skeleton -->
+      <div class="card">
+        <div class="card-body" style="padding-bottom:0;">
+          <div class="section-title">
+            <span class="section-icon">[icon:Award]</span>
+            Especialidades
+          </div>
+        </div>
+        <div style="padding:0 16px 16px;display:flex;gap:6px;">
+          <div class="skeleton skel-tag"></div>
+          <div class="skeleton skel-tag" style="width:70px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

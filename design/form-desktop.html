@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Veterinario — Formulario Desktop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cg-bg: #F6F5F1;
+      --cg-surface: #FFFFFF;
+      --cg-border: #E8E6E1;
+      --cg-text: #1A1918;
+      --cg-text-muted: #9B9893;
+      --cg-accent: #F5A800;
+      --cg-accent-hover: #E09800;
+      --cg-gold-lt: #FFFBF0;
+      --cg-danger: #DC2626;
+      --cg-danger-bg: #FEF2F2;
+      --cg-success: #16A34A;
+      --cg-warning: #F59E0B;
+      --cg-r-md: 8px;
+      --cg-r-lg: 12px;
+      --cg-r-xl: 18px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: var(--cg-bg);
+      color: var(--cg-text);
+    }
+    h1, h2, h3 { font-family: 'Noto Serif JP', serif; }
+
+    .page { max-width: 800px; margin: 0 auto; padding: 32px 24px; }
+
+    /* Header */
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .btn-back {
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--cg-border);
+      background: var(--cg-surface);
+      border-radius: var(--cg-r-md);
+      cursor: pointer;
+      font-size: 16px;
+      color: var(--cg-text-muted);
+    }
+    .btn-back:hover { border-color: var(--cg-accent); color: var(--cg-text); }
+    .page-title { font-size: 22px; font-weight: 700; }
+
+    /* Form sections */
+    .form-card {
+      background: var(--cg-surface);
+      border: 1px solid var(--cg-border);
+      border-radius: var(--cg-r-xl);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-icon { color: var(--cg-text-muted); font-size: 16px; }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .form-row:last-child { margin-bottom: 0; }
+    .form-row.full { grid-template-columns: 1fr; }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--cg-text);
+    }
+    .form-label .required { color: var(--cg-danger); margin-left: 2px; }
+    .form-hint { font-size: 12px; color: var(--cg-text-muted); }
+
+    .form-input,
+    .form-select {
+      padding: 10px 12px;
+      border: 1px solid var(--cg-border);
+      border-radius: var(--cg-r-md);
+      font-size: 14px;
+      font-family: 'Roboto', sans-serif;
+      background: var(--cg-surface);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-input:focus,
+    .form-select:focus { border-color: var(--cg-accent); }
+    .form-input::placeholder { color: var(--cg-text-muted); }
+
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239B9893' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+      cursor: pointer;
+    }
+
+    /* StaffPicker inline */
+    .staff-picker {
+      border: 1px solid var(--cg-border);
+      border-radius: var(--cg-r-md);
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .staff-picker:hover { border-color: var(--cg-accent); }
+    .staff-picker-icon { color: var(--cg-text-muted); font-size: 14px; }
+    .staff-picker-text { font-size: 14px; color: var(--cg-text-muted); }
+    .staff-picker.selected .staff-picker-text { color: var(--cg-text); }
+
+    .staff-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px 4px 4px;
+      background: #F0EFEB;
+      border-radius: 20px;
+    }
+    .staff-chip-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #3B82F6;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+    }
+    .staff-chip-name { font-size: 13px; font-weight: 500; }
+    .staff-chip-remove {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--cg-text-muted);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      cursor: pointer;
+      margin-left: 4px;
+    }
+
+    /* Toggle */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+    }
+    .toggle-label-group { display: flex; flex-direction: column; gap: 2px; }
+    .toggle-label { font-size: 14px; font-weight: 500; }
+    .toggle-desc { font-size: 12px; color: var(--cg-text-muted); }
+    .toggle {
+      width: 44px;
+      height: 24px;
+      border-radius: 12px;
+      background: #D1D5DB;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle.on { background: var(--cg-success); }
+    .toggle-knob {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: left 0.2s;
+    }
+    .toggle.on .toggle-knob { left: 22px; }
+
+    /* Footer */
+    .form-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding-top: 8px;
+    }
+    .btn-primary {
+      padding: 10px 24px;
+      background: var(--cg-accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--cg-r-md);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: var(--cg-accent-hover); }
+    .btn-cancel {
+      padding: 10px 24px;
+      background: transparent;
+      color: var(--cg-text-muted);
+      border: 1px solid var(--cg-border);
+      border-radius: var(--cg-r-md);
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-cancel:hover { border-color: var(--cg-text-muted); color: var(--cg-text); }
+
+    /* Divider */
+    .divider { border-top: 1px solid var(--cg-border); margin: 16px 0; }
+
+    /* Skeleton */
+    @keyframes shimmer {
+      0% { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #EEECE7 25%, #F5F3EE 50%, #EEECE7 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.5s ease-in-out infinite;
+      border-radius: var(--cg-r-md);
+    }
+    .skel-line { height: 14px; }
+    .skel-line.label { width: 30%; height: 12px; margin-bottom: 8px; }
+    .skel-input { width: 100%; height: 40px; }
+    .skel-toggle { width: 44px; height: 24px; border-radius: 12px; }
+
+    .skeleton-section { margin-top: 48px; border-top: 2px dashed var(--cg-border); padding-top: 32px; }
+    .skeleton-label { font-size: 13px; font-weight: 500; color: var(--cg-text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- Header -->
+    <div class="page-header">
+      <button class="btn-back">[icon:ArrowLeft]</button>
+      <h1 class="page-title">Nuevo profesional</h1>
+    </div>
+
+    <!-- Section 1: Empleado base -->
+    <div class="form-card">
+      <div class="section-title">
+        <span class="section-icon">[icon:User]</span>
+        Empleado
+      </div>
+
+      <div class="form-row full">
+        <div class="form-group">
+          <label class="form-label">Empleado del equipo<span class="required">*</span></label>
+          <div class="form-hint">Selecciona un miembro del staff para agregar datos veterinarios</div>
+          <!-- Estado: sin seleccionar -->
+          <!--
+          <div class="staff-picker">
+            <span class="staff-picker-icon">[icon:Search]</span>
+            <span class="staff-picker-text">Buscar empleado...</span>
+          </div>
+          -->
+          <!-- Estado: seleccionado -->
+          <div class="staff-picker selected">
+            <span class="staff-chip">
+              <span class="staff-chip-avatar">MG</span>
+              <span class="staff-chip-name">Dra. Maria Garcia</span>
+              <span class="staff-chip-remove">x</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Datos profesionales -->
+    <div class="form-card">
+      <div class="section-title">
+        <span class="section-icon">[icon:Stethoscope]</span>
+        Datos profesionales
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Numero de matricula<span class="required">*</span></label>
+          <input type="text" class="form-input" placeholder="Ej: 12345" value="12345">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Colegio emisor</label>
+          <div class="form-hint">Colegio profesional que emitio la matricula</div>
+          <input type="text" class="form-input" placeholder="Ej: CVPBA, COVET Cordoba" value="CVPBA">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Especialidad</label>
+          <select class="form-select">
+            <option value="">Sin especialidad</option>
+            <option selected>Clinica Medica</option>
+            <option>Cirugia</option>
+            <option>Dermatologia</option>
+            <option>Cardiologia</option>
+            <option>Oftalmologia</option>
+            <option>Oncologia</option>
+            <option>Traumatologia y Ortopedia</option>
+            <option>Diagnostico por Imagenes</option>
+            <option>Anestesiologia</option>
+            <option>Odontologia</option>
+            <option>Neurologia</option>
+            <option>Nutricion Animal</option>
+            <option>Reproduccion</option>
+            <option>Medicina Felina</option>
+            <option>Comportamiento Animal</option>
+            <option>Otra</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">SENASA (opcional)</label>
+          <div class="form-hint">Numero de acreditacion sanitaria</div>
+          <input type="text" class="form-input" placeholder="Ej: 12345678">
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Estado -->
+    <div class="form-card">
+      <div class="toggle-row">
+        <div class="toggle-label-group">
+          <span class="toggle-label">Profesional activo</span>
+          <span class="toggle-desc">Los profesionales inactivos no aparecen en selectores ni en la agenda</span>
+        </div>
+        <div class="toggle on">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="form-footer">
+      <button class="btn-cancel">Cancelar</button>
+      <button class="btn-primary">Guardar profesional</button>
+    </div>
+
+    <!-- ==================== SKELETON STATE ==================== -->
+    <div class="skeleton-section">
+      <div class="skeleton-label">Estado: Cargando (modo edicion)</div>
+
+      <!-- Empleado skeleton -->
+      <div class="form-card">
+        <div class="section-title">
+          <span class="section-icon">[icon:User]</span>
+          Empleado
+        </div>
+        <div class="form-row full">
+          <div class="form-group">
+            <div class="skeleton skel-line label"></div>
+            <div class="skeleton skel-input"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Datos profesionales skeleton -->
+      <div class="form-card">
+        <div class="section-title">
+          <span class="section-icon">[icon:Stethoscope]</span>
+          Datos profesionales
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <div class="skeleton skel-line label"></div>
+            <div class="skeleton skel-input"></div>
+          </div>
+          <div class="form-group">
+            <div class="skeleton skel-line label"></div>
+            <div class="skeleton skel-input"></div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <div class="skeleton skel-line label"></div>
+            <div class="skeleton skel-input"></div>
+          </div>
+          <div class="form-group">
+            <div class="skeleton skel-line label"></div>
+            <div class="skeleton skel-input"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado skeleton -->
+      <div class="form-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0">
+          <div style="flex:1">
+            <div class="skeleton skel-line" style="width:40%;margin-bottom:6px"></div>
+            <div class="skeleton skel-line tiny" style="width:70%"></div>
+          </div>
+          <div class="skeleton skel-toggle"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
