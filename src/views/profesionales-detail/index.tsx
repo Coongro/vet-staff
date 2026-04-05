@@ -25,11 +25,7 @@ const h = React.createElement;
 
 // --- Header con navegacion y acciones ---
 
-function DetailHeader(props: {
-  onBack: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
-}) {
+function DetailHeader(props: { onBack: () => void; onEdit: () => void; onDelete: () => void }) {
   return h(
     'div',
     { className: 'flex items-center justify-between' },
@@ -86,7 +82,12 @@ function ProfessionalDetail(props: {
   }, [data, toast, onDeleted]);
 
   if (loading) return h(DetailSkeleton, { isMobile });
-  if (error) return h(UI.ErrorDisplay, { title: 'Error al cargar', message: error, onRetry: () => void refetch() });
+  if (error)
+    return h(UI.ErrorDisplay, {
+      title: 'Error al cargar',
+      message: error,
+      onRetry: () => void refetch(),
+    });
 
   if (!data) {
     return h(UI.EmptyState, {
@@ -131,7 +132,9 @@ function ProfessionalDetail(props: {
     deleteConfirm,
     h(
       'div',
-      { style: { display: 'grid', gridTemplateColumns: '320px 1fr', gap: 20, alignItems: 'start' } },
+      {
+        style: { display: 'grid', gridTemplateColumns: '320px 1fr', gap: 20, alignItems: 'start' },
+      },
       h(ProfileCardDesktop, { data }),
       h(
         'div',

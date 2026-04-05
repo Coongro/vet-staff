@@ -6,7 +6,17 @@ import { getHostReact, getHostUI } from '@coongro/plugin-sdk';
 
 import type { VetProfessionalDetail } from '../../hooks/useVetProfessional.js';
 
-import { AvatarCircle, BORDER_TOP, LABEL_STYLE, MUTED_ICON_STYLE, SERIF_FONT, StatusBadge, avatarColor, formatDate, getInitials } from './utils.js';
+import {
+  AvatarCircle,
+  BORDER_TOP,
+  LABEL_STYLE,
+  MUTED_ICON_STYLE,
+  SERIF_FONT,
+  StatusBadge,
+  avatarColor,
+  formatDate,
+  getInitials,
+} from './utils.js';
 
 const React = getHostReact();
 const UI = getHostUI();

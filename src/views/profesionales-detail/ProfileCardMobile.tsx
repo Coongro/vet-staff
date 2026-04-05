@@ -6,7 +6,16 @@ import { getHostReact, getHostUI } from '@coongro/plugin-sdk';
 
 import type { VetProfessionalDetail } from '../../hooks/useVetProfessional.js';
 
-import { AvatarCircle, BORDER_TOP, MUTED_COLOR, MUTED_ICON_STYLE, SERIF_FONT, StatusBadge, avatarColor, getInitials } from './utils.js';
+import {
+  AvatarCircle,
+  BORDER_TOP,
+  MUTED_COLOR,
+  MUTED_ICON_STYLE,
+  SERIF_FONT,
+  StatusBadge,
+  avatarColor,
+  getInitials,
+} from './utils.js';
 
 const React = getHostReact();
 const UI = getHostUI();
@@ -38,11 +47,7 @@ export function ProfileCardMobile(props: { data: VetProfessionalDetail }) {
       h(
         'div',
         { style: { flex: 1, minWidth: 0 } },
-        h(
-          'div',
-          { style: { fontFamily: SERIF_FONT, fontSize: 16, fontWeight: 700 } },
-          name
-        ),
+        h('div', { style: { fontFamily: SERIF_FONT, fontSize: 16, fontWeight: 700 } }, name),
         h(
           'div',
           { style: { fontSize: 12, color: MUTED_COLOR, marginTop: 2 } },
@@ -61,11 +66,7 @@ export function ProfileCardMobile(props: { data: VetProfessionalDetail }) {
             size: 13,
             style: MUTED_ICON_STYLE,
           }),
-          h(
-            'div',
-            { style: { flex: 1, minWidth: 0, color: 'var(--cg-accent)' } },
-            data.staff_email
-          )
+          h('div', { style: { flex: 1, minWidth: 0, color: 'var(--cg-accent)' } }, data.staff_email)
         )
       : null,
     // Telefono

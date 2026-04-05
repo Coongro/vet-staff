@@ -264,7 +264,7 @@ export function ProfesionalesView() {
     (key: string, direction: 'asc' | 'desc' | null) => {
       if (!SORTABLE_KEYS.has(key)) return;
       setSortKey(direction ? key : '');
-      setSortDir((direction ?? 'asc'));
+      setSortDir(direction ?? 'asc');
       setSort(key, direction ?? 'asc');
     },
     [setSort]
@@ -361,7 +361,10 @@ export function ProfesionalesView() {
           h(
             'span',
             { className: 'text-xs', style: { color: 'var(--cg-text-muted)' } },
-            settings.licensePrefix + ' ' + p.license_number + (p.license_college ? ' · ' + p.license_college : '')
+            settings.licensePrefix +
+              ' ' +
+              p.license_number +
+              (p.license_college ? ' · ' + p.license_college : '')
           )
         ),
         !p.is_active

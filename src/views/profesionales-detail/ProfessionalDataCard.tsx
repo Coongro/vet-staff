@@ -153,9 +153,7 @@ function SenasaCell(props: { data: VetProfessional; settings: VetStaffSettings }
         style: {
           fontSize: 15,
           fontWeight: 500,
-          ...(hasSenasa
-            ? { fontFamily: MONO_FONT }
-            : { color: MUTED_COLOR }),
+          ...(hasSenasa ? { fontFamily: MONO_FONT } : { color: MUTED_COLOR }),
         },
       },
       data.senasa_number || 'No registrado'

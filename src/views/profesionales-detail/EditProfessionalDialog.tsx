@@ -5,7 +5,12 @@ import { getHostReact, getHostUI, usePlugin, actions } from '@coongro/plugin-sdk
 
 import type { VetStaffSettings } from '../../hooks/useVetStaffSettings.js';
 import type { VetProfessional } from '../../types/vet-professional.js';
-import { ActiveToggle, LicenseFields, SenasaField, SpecialtiesField } from '../shared/form-fields.js';
+import {
+  ActiveToggle,
+  LicenseFields,
+  SenasaField,
+  SpecialtiesField,
+} from '../shared/form-fields.js';
 
 const React = getHostReact();
 const UI = getHostUI();
