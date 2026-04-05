@@ -6,6 +6,8 @@ import { getHostReact, getHostUI } from '@coongro/plugin-sdk';
 
 import type { VetProfessionalDetail } from '../../hooks/useVetProfessional.js';
 
+import { DEFAULT_STAFF_ROLE } from '../../lib/constants.js';
+
 import {
   AvatarCircle,
   BORDER_TOP,
@@ -104,7 +106,7 @@ export function ProfileCardDesktop(props: { data: VetProfessionalDetail }) {
       h(
         'div',
         { style: { fontSize: 13, color: 'var(--cg-text-muted)', marginTop: 4 } },
-        data.staff_role ?? 'Veterinario'
+        data.staff_role ?? DEFAULT_STAFF_ROLE
       ),
       h('div', { style: { marginTop: 8 } }, h(StatusBadge, { isActive: data.is_active }))
     ),
@@ -132,8 +134,8 @@ export function ProfileCardDesktop(props: { data: VetProfessionalDetail }) {
         : null,
       h(ContactRow, {
         icon: 'Briefcase',
-        label: 'Rol en staff',
-        value: data.staff_role ?? 'Veterinario',
+        label: 'Cargo',
+        value: data.staff_role ?? DEFAULT_STAFF_ROLE,
         showBorder: hasEmail || hasPhone,
       }),
       h(ContactRow, {

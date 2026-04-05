@@ -16,12 +16,43 @@ import { ProfessionalDataDesktop, ProfessionalDataMobile } from './ProfessionalD
 import { ProfileCardDesktop } from './ProfileCardDesktop.js';
 import { ProfileCardMobile } from './ProfileCardMobile.js';
 import { SpecialtiesCard } from './SpecialtiesCard.js';
-import { useIsMobile } from './utils.js';
+import { BORDER_TOP, formatDateShort, useIsMobile } from './utils.js';
 
 const React = getHostReact();
 const UI = getHostUI();
 const { useState, useCallback } = React;
 const h = React.createElement;
+
+// --- Timestamps (siempre visible) ---
+
+function TimestampsFooter(props: { createdAt: string; updatedAt: string; isMobile: boolean }) {
+  return h(
+    'div',
+    {
+      style: {
+        display: 'flex',
+        flexDirection: props.isMobile ? ('column' as const) : ('row' as const),
+        gap: props.isMobile ? 4 : 24,
+        fontSize: 12,
+        padding: '12px 0',
+        color: 'var(--cg-text-muted)',
+        borderTop: BORDER_TOP,
+      },
+    },
+    h(
+      'div',
+      { style: { display: 'flex', alignItems: 'center', gap: 6 } },
+      h(UI.DynamicIcon, { icon: 'Clock', size: 12 }),
+      'Registrado: ' + formatDateShort(props.createdAt)
+    ),
+    h(
+      'div',
+      { style: { display: 'flex', alignItems: 'center', gap: 6 } },
+      h(UI.DynamicIcon, { icon: 'RefreshCw', size: 12 }),
+      'Actualizado: ' + formatDateShort(props.updatedAt)
+    )
+  );
+}
 
 // --- Header con navegacion y acciones ---
 
@@ -113,6 +144,15 @@ function ProfessionalDetail(props: {
       })
     : null;
 
+  const showDataCard = settings.showLicense || settings.showSenasa;
+  const showSpecialties = settings.showSpecialty;
+  const hasRightColumn = showDataCard || showSpecialties;
+  const timestamps = h(TimestampsFooter, {
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+    isMobile,
+  });
+
   if (isMobile) {
     return h(
       'div',
@@ -120,8 +160,25 @@ function ProfessionalDetail(props: {
       header,
       deleteConfirm,
       h(ProfileCardMobile, { data }),
-      h(ProfessionalDataMobile, { data, settings }),
-      h(SpecialtiesCard, { data, isMobile: true })
+      showDataCard ? h(ProfessionalDataMobile, { data, settings }) : null,
+      showSpecialties ? h(SpecialtiesCard, { data }) : null,
+      timestamps
+    );
+  }
+
+  // Sin columna derecha: profile card centrado
+  if (!hasRightColumn) {
+    return h(
+      'div',
+      { style: { display: 'flex', flexDirection: 'column' as const, gap: 20 } },
+      header,
+      deleteConfirm,
+      h(
+        'div',
+        { style: { maxWidth: 400, margin: '0 auto', width: '100%' } },
+        h(ProfileCardDesktop, { data }),
+        timestamps
+      )
     );
   }
 
@@ -139,10 +196,11 @@ function ProfessionalDetail(props: {
       h(
         'div',
         { style: { display: 'flex', flexDirection: 'column' as const, gap: 20 } },
-        h(ProfessionalDataDesktop, { data, settings }),
-        h(SpecialtiesCard, { data, isMobile: false })
+        showDataCard ? h(ProfessionalDataDesktop, { data, settings }) : null,
+        showSpecialties ? h(SpecialtiesCard, { data }) : null
       )
-    )
+    ),
+    timestamps
   );
 }
 

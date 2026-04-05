@@ -7,19 +7,15 @@ const React = getHostReact();
 const { useMemo } = React;
 
 export interface VetStaffSettings {
-  licensePrefix: string;
-  defaultCollege: string;
-  senasaEnabled: boolean;
-  senasaRequired: boolean;
-  showInactive: boolean;
+  showLicense: boolean;
+  showSpecialty: boolean;
+  showSenasa: boolean;
 }
 
 const DEFAULTS: VetStaffSettings = {
-  licensePrefix: 'MP',
-  defaultCollege: '',
-  senasaEnabled: false,
-  senasaRequired: false,
-  showInactive: true,
+  showLicense: true,
+  showSpecialty: true,
+  showSenasa: false,
 };
 
 export function useVetStaffSettings() {
@@ -28,12 +24,9 @@ export function useVetStaffSettings() {
   const settings = useMemo<VetStaffSettings>(() => {
     if (!values || loading) return DEFAULTS;
     return {
-      licensePrefix: (values['vet-staff.license.prefix'] as string) ?? DEFAULTS.licensePrefix,
-      defaultCollege:
-        (values['vet-staff.license.defaultCollege'] as string) ?? DEFAULTS.defaultCollege,
-      senasaEnabled: (values['vet-staff.senasa.enabled'] as boolean) ?? DEFAULTS.senasaEnabled,
-      senasaRequired: (values['vet-staff.senasa.required'] as boolean) ?? DEFAULTS.senasaRequired,
-      showInactive: (values['vet-staff.showInactive'] as boolean) ?? DEFAULTS.showInactive,
+      showLicense: (values['vet-staff.fields.license'] as boolean) ?? DEFAULTS.showLicense,
+      showSpecialty: (values['vet-staff.fields.specialty'] as boolean) ?? DEFAULTS.showSpecialty,
+      showSenasa: (values['vet-staff.fields.senasa'] as boolean) ?? DEFAULTS.showSenasa,
     };
   }, [values, loading]);
 
