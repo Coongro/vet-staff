@@ -10,6 +10,13 @@ import { useVetProfessionals } from '../../hooks/useVetProfessionals.js';
 import { useVetStaffSettings } from '../../hooks/useVetStaffSettings.js';
 import { SPECIALTIES, formatSpecialty } from '../../lib/specialties.js';
 import type { VetProfessional } from '../../types/vet-professional.js';
+import {
+  ActiveToggle,
+  LicenseFields,
+  PersonalDataFields,
+  SenasaField,
+  SpecialtiesField,
+} from '../shared/form-fields.js';
 
 const React = getHostReact();
 const UI = getHostUI();
@@ -150,7 +157,7 @@ function CreateProfessionalDialog(props: {
         h(UI.Button, { variant: 'outline', onClick: handleClose, disabled: saving }, 'Cancelar'),
         h(
           UI.Button,
-          { variant: 'brand', onClick: handleSave, disabled: saving },
+          { variant: 'brand', onClick: () => void handleSave(), disabled: saving },
           saving ? 'Guardando...' : 'Guardar'
         )
       ),
@@ -160,147 +167,43 @@ function CreateProfessionalDialog(props: {
     h(
       'div',
       { className: 'flex flex-col gap-4' },
-      h(
-        'div',
-        null,
-        h(
-          'label',
-          { className: 'text-sm font-medium text-cg-text mb-1 block' },
-          'Nombre completo',
-          h('span', { className: 'text-cg-danger ml-0.5' }, '*')
-        ),
-        h(UI.Input, {
-          value: form.name,
-          onChange: (e: { target: { value: string } }) => updateField('name', e.target.value),
-          placeholder: 'Ej: Dra. Maria Garcia',
-        }),
-        errors.name ? h('p', { className: 'text-xs text-cg-danger mt-1' }, errors.name) : null
-      ),
-      h(
-        'div',
-        { className: 'grid grid-cols-1 sm:grid-cols-2 gap-4' },
-        h(
-          'div',
-          null,
-          h('label', { className: 'text-sm font-medium text-cg-text mb-1 block' }, 'Email'),
-          h(UI.Input, {
-            value: form.email,
-            onChange: (e: { target: { value: string } }) => updateField('email', e.target.value),
-            placeholder: 'email@ejemplo.com',
-          })
-        ),
-        h(
-          'div',
-          null,
-          h('label', { className: 'text-sm font-medium text-cg-text mb-1 block' }, 'Telefono'),
-          h(UI.Input, {
-            value: form.phone,
-            onChange: (e: { target: { value: string } }) => updateField('phone', e.target.value),
-            placeholder: '+54 11 1234-5678',
-          })
-        )
-      ),
+      h(PersonalDataFields, {
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        nameError: errors.name,
+        onNameChange: (v: string) => updateField('name', v),
+        onEmailChange: (v: string) => updateField('email', v),
+        onPhoneChange: (v: string) => updateField('phone', v),
+      }),
 
       h(UI.Separator, null),
 
       // Datos profesionales
-      h(
-        'div',
-        { className: 'grid grid-cols-1 sm:grid-cols-2 gap-4' },
-        h(
-          'div',
-          null,
-          h(
-            'label',
-            { className: 'text-sm font-medium text-cg-text mb-1 block' },
-            'Matricula',
-            h('span', { className: 'text-cg-danger ml-0.5' }, '*')
-          ),
-          h(UI.Input, {
-            value: form.license_number,
-            onChange: (e: { target: { value: string } }) =>
-              updateField('license_number', e.target.value),
-            placeholder: 'Ej: 12345',
-          }),
-          errors.license_number
-            ? h('p', { className: 'text-xs text-cg-danger mt-1' }, errors.license_number)
-            : null
-        ),
-        h(
-          'div',
-          null,
-          h(
-            'label',
-            { className: 'text-sm font-medium text-cg-text mb-1 block' },
-            'Colegio emisor'
-          ),
-          h(UI.Input, {
-            value: form.license_college,
-            onChange: (e: { target: { value: string } }) =>
-              updateField('license_college', e.target.value),
-            placeholder: 'Ej: CVPBA',
-          })
-        )
-      ),
-      h(
-        'div',
-        null,
-        h('label', { className: 'text-sm font-medium text-cg-text mb-1 block' }, 'Especialidades'),
-        h(
-          UI.MultiSelect,
-          {
-            values: form.specialties,
-            onValuesChange: (vals: string[]) => updateField('specialties', vals),
-            placeholder: 'Seleccionar especialidades...',
-          },
-          ...SPECIALTIES.map((s) => h(UI.SelectItem, { key: s, value: s }, formatSpecialty(s)))
-        )
-      ),
-      settings.senasaEnabled
-        ? h(
-            'div',
-            null,
-            h(
-              'label',
-              { className: 'text-sm font-medium text-cg-text mb-1 block' },
-              'SENASA',
-              settings.senasaRequired
-                ? h('span', { className: 'text-cg-danger ml-0.5' }, '*')
-                : h('span', { className: 'text-cg-text-muted ml-1' }, '(opcional)')
-            ),
-            h(UI.Input, {
-              value: form.senasa_number,
-              onChange: (e: { target: { value: string } }) =>
-                updateField('senasa_number', e.target.value),
-              placeholder: 'Ej: 12345678',
-            }),
-            errors.senasa_number
-              ? h('p', { className: 'text-xs text-cg-danger mt-1' }, errors.senasa_number)
-              : null
-          )
-        : null,
+      h(LicenseFields, {
+        licenseNumber: form.license_number,
+        licenseCollege: form.license_college,
+        licenseError: errors.license_number,
+        onLicenseNumberChange: (v: string) => updateField('license_number', v),
+        onLicenseCollegeChange: (v: string) => updateField('license_college', v),
+      }),
+      h(SpecialtiesField, {
+        values: form.specialties,
+        onValuesChange: (vals: string[]) => updateField('specialties', vals),
+      }),
+      h(SenasaField, {
+        settings,
+        value: form.senasa_number,
+        error: errors.senasa_number,
+        onChange: (v: string) => updateField('senasa_number', v),
+      }),
 
       h(UI.Separator, null),
 
-      // Toggle activo/inactivo
-      h(
-        'div',
-        { className: 'flex items-center justify-between' },
-        h(
-          'div',
-          null,
-          h('span', { className: 'text-sm font-medium text-cg-text block' }, 'Profesional activo'),
-          h(
-            'span',
-            { className: 'text-xs text-cg-text-muted' },
-            'Los inactivos no aparecen en selectores ni agenda'
-          )
-        ),
-        h(UI.Switch, {
-          checked: form.is_active,
-          onCheckedChange: (checked: boolean) => updateField('is_active', checked),
-        })
-      )
+      h(ActiveToggle, {
+        checked: form.is_active,
+        onCheckedChange: (checked: boolean) => updateField('is_active', checked),
+      })
     )
   );
 }

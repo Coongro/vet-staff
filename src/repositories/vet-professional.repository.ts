@@ -32,7 +32,7 @@ export class VetProfessionalRepository {
     return this.db.ormQuery((tx) =>
       tx
         .update(vetProfessionalTable)
-        .set({ ...data, updated_at: new Date().toISOString() })
+        .set({ ...data, updated_at: new Date().toISOString() } as Partial<VetProfessionalRow>)
         .where(eq(vetProfessionalTable.id, id))
         .returning()
     );

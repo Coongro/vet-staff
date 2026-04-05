@@ -8,12 +8,13 @@ import { getHostReact, getHostUI, usePlugin, actions } from '@coongro/plugin-sdk
 import { useVetProfessional } from '../../hooks/useVetProfessional.js';
 import { useVetStaffSettings } from '../../hooks/useVetStaffSettings.js';
 import type { VetProfessional } from '../../types/vet-professional.js';
+
 import { DeleteConfirmation } from './DeleteConfirmation.js';
 import { DetailSkeleton } from './DetailSkeleton.js';
 import { EditProfessionalDialog } from './EditProfessionalDialog.js';
+import { ProfessionalDataDesktop, ProfessionalDataMobile } from './ProfessionalDataCard.js';
 import { ProfileCardDesktop } from './ProfileCardDesktop.js';
 import { ProfileCardMobile } from './ProfileCardMobile.js';
-import { ProfessionalDataDesktop, ProfessionalDataMobile } from './ProfessionalDataCard.js';
 import { SpecialtiesCard } from './SpecialtiesCard.js';
 import { useIsMobile } from './utils.js';
 
@@ -21,6 +22,31 @@ const React = getHostReact();
 const UI = getHostUI();
 const { useState, useCallback } = React;
 const h = React.createElement;
+
+// --- Header con navegacion y acciones ---
+
+function DetailHeader(props: {
+  onBack: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  return h(
+    'div',
+    { className: 'flex items-center justify-between' },
+    h(
+      UI.Button,
+      { variant: 'ghost', onClick: props.onBack, className: 'gap-1' },
+      h(UI.DynamicIcon, { icon: 'ArrowLeft', size: 16 }),
+      'Volver'
+    ),
+    h(
+      'div',
+      { className: 'flex gap-2 flex-shrink-0' },
+      h(UI.Button, { variant: 'outline', size: 'sm', onClick: props.onEdit }, 'Editar'),
+      h(UI.Button, { variant: 'destructive', size: 'sm', onClick: props.onDelete }, 'Eliminar')
+    )
+  );
+}
 
 // --- Componente de detalle ---
 
@@ -40,7 +66,6 @@ function ProfessionalDetail(props: {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // Re-fetch cuando cambia el refreshKey (despues de editar)
   React.useEffect(() => {
     if (refreshKey > 0) void refetch();
   }, [refreshKey, refetch]);
@@ -60,13 +85,8 @@ function ProfessionalDetail(props: {
     }
   }, [data, toast, onDeleted]);
 
-  if (loading) {
-    return h(DetailSkeleton, { isMobile });
-  }
-
-  if (error) {
-    return h(UI.ErrorDisplay, { title: 'Error al cargar', message: error, onRetry: () => void refetch() });
-  }
+  if (loading) return h(DetailSkeleton, { isMobile });
+  if (error) return h(UI.ErrorDisplay, { title: 'Error al cargar', message: error, onRetry: () => void refetch() });
 
   if (!data) {
     return h(UI.EmptyState, {
@@ -77,27 +97,11 @@ function ProfessionalDetail(props: {
     });
   }
 
-  // Header con navegacion y acciones
-  const header = h(
-    'div',
-    { className: 'flex items-center justify-between' },
-    h(
-      UI.Button,
-      { variant: 'ghost', onClick: onBack, className: 'gap-1' },
-      h(UI.DynamicIcon, { icon: 'ArrowLeft', size: 16 }),
-      'Volver'
-    ),
-    h(
-      'div',
-      { className: 'flex gap-2 flex-shrink-0' },
-      h(UI.Button, { variant: 'outline', size: 'sm', onClick: () => onEdit(data) }, 'Editar'),
-      h(
-        UI.Button,
-        { variant: 'destructive', size: 'sm', onClick: () => setConfirmDelete(true) },
-        'Eliminar'
-      )
-    )
-  );
+  const header = h(DetailHeader, {
+    onBack,
+    onEdit: () => onEdit(data),
+    onDelete: () => setConfirmDelete(true),
+  });
 
   const deleteConfirm = confirmDelete
     ? h(DeleteConfirmation, {
@@ -108,7 +112,6 @@ function ProfessionalDetail(props: {
       })
     : null;
 
-  // Mobile: cards apiladas
   if (isMobile) {
     return h(
       'div',
@@ -121,7 +124,6 @@ function ProfessionalDetail(props: {
     );
   }
 
-  // Desktop: dos columnas
   return h(
     'div',
     { style: { display: 'flex', flexDirection: 'column' as const, gap: 20 } },
@@ -129,9 +131,7 @@ function ProfessionalDetail(props: {
     deleteConfirm,
     h(
       'div',
-      {
-        style: { display: 'grid', gridTemplateColumns: '320px 1fr', gap: 20, alignItems: 'start' },
-      },
+      { style: { display: 'grid', gridTemplateColumns: '320px 1fr', gap: 20, alignItems: 'start' } },
       h(ProfileCardDesktop, { data }),
       h(
         'div',
