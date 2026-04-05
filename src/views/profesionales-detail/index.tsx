@@ -1,8 +1,3 @@
-/**
- * Vista de detalle de un profesional veterinario.
- * Muestra perfil, datos profesionales, especialidades.
- * Permite editar y eliminar.
- */
 import { getHostReact, getHostUI, usePlugin, actions } from '@coongro/plugin-sdk';
 
 import { useVetProfessional } from '../../hooks/useVetProfessional.js';
@@ -145,8 +140,7 @@ function ProfessionalDetail(props: {
     : null;
 
   const showDataCard = settings.showLicense || settings.showSenasa;
-  const showSpecialties = settings.showSpecialty;
-  const hasRightColumn = showDataCard || showSpecialties;
+  const hasRightColumn = showDataCard || settings.showSpecialty;
   const timestamps = h(TimestampsFooter, {
     createdAt: data.created_at,
     updatedAt: data.updated_at,
@@ -161,7 +155,7 @@ function ProfessionalDetail(props: {
       deleteConfirm,
       h(ProfileCardMobile, { data }),
       showDataCard ? h(ProfessionalDataMobile, { data, settings }) : null,
-      showSpecialties ? h(SpecialtiesCard, { data }) : null,
+      settings.showSpecialty ? h(SpecialtiesCard, { data }) : null,
       timestamps
     );
   }
@@ -197,7 +191,7 @@ function ProfessionalDetail(props: {
         'div',
         { style: { display: 'flex', flexDirection: 'column' as const, gap: 20 } },
         showDataCard ? h(ProfessionalDataDesktop, { data, settings }) : null,
-        showSpecialties ? h(SpecialtiesCard, { data }) : null
+        settings.showSpecialty ? h(SpecialtiesCard, { data }) : null
       )
     ),
     timestamps
@@ -215,7 +209,7 @@ export function ProfesionalesDetailView(props: { professionalId?: string }) {
   const [editTarget, setEditTarget] = useState<VetProfessional | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const handleBack = useCallback(() => {
+  const goToList = useCallback(() => {
     views.open('vet-staff.profesionales.open');
   }, [views]);
 
@@ -226,10 +220,6 @@ export function ProfesionalesDetailView(props: { professionalId?: string }) {
   const handleEditSaved = useCallback(() => {
     setRefreshKey((k: number) => k + 1);
   }, []);
-
-  const handleDeleted = useCallback(() => {
-    views.open('vet-staff.profesionales.open');
-  }, [views]);
 
   if (!professionalId) {
     return h(UI.EmptyState, {
@@ -246,9 +236,9 @@ export function ProfesionalesDetailView(props: { professionalId?: string }) {
       { className: 'w-full', style: { maxWidth: 1080, margin: '0 auto' } },
       h(ProfessionalDetail, {
         professionalId,
-        onBack: handleBack,
+        onBack: goToList,
         onEdit: handleEdit,
-        onDeleted: handleDeleted,
+        onDeleted: goToList,
         refreshKey,
       })
     ),

@@ -1,7 +1,3 @@
-/**
- * Campos de formulario reutilizables para crear/editar profesionales.
- * Compartidos entre CreateProfessionalDialog y EditProfessionalDialog.
- */
 import { getHostReact, getHostUI } from '@coongro/plugin-sdk';
 
 import { SPECIALTIES, formatSpecialty } from '../../lib/specialties.js';

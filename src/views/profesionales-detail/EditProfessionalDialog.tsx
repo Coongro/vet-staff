@@ -1,6 +1,3 @@
-/**
- * Dialog para editar los datos profesionales de un veterinario.
- */
 import { getHostReact, getHostUI, usePlugin, actions } from '@coongro/plugin-sdk';
 
 import type { VetStaffSettings } from '../../hooks/useVetStaffSettings.js';
@@ -47,7 +44,7 @@ export function EditProfessionalDialog(props: {
 
   const [form, setForm] = useState<EditFormData>(() => buildInitialForm(professional));
   const [saving, setSaving] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Partial<Record<string, string>>>({});
 
   // Sincronizar form cuando cambia el profesional
   React.useEffect(() => {
@@ -57,15 +54,11 @@ export function EditProfessionalDialog(props: {
 
   const updateField = useCallback((key: string, value: unknown) => {
     setForm((prev: EditFormData) => ({ ...prev, [key]: value }));
-    setErrors((prev: Record<string, string>) => {
-      const next = { ...prev };
-      delete next[key];
-      return next;
-    });
+    setErrors((prev) => ({ ...prev, [key]: undefined }));
   }, []);
 
   const handleSave = useCallback(async () => {
-    const errs: Record<string, string> = {};
+    const errs: Partial<Record<string, string>> = {};
     if (settings.showLicense && !form.license_number.trim()) {
       errs.license_number = 'La matricula es obligatoria';
     }
@@ -76,6 +69,13 @@ export function EditProfessionalDialog(props: {
 
     setSaving(true);
     try {
+      let specialty: string | null;
+      if (!settings.showSpecialty) {
+        specialty = professional.specialty;
+      } else {
+        specialty = form.specialties.length > 0 ? form.specialties.join(',') : null;
+      }
+
       await actions.execute('vet-staff.professionals.update', {
         id: professional.id,
         data: {
@@ -85,12 +85,7 @@ export function EditProfessionalDialog(props: {
           license_college: settings.showLicense
             ? form.license_college.trim() || null
             : professional.license_college,
-          specialty:
-            settings.showSpecialty && form.specialties.length > 0
-              ? form.specialties.join(',')
-              : settings.showSpecialty
-                ? null
-                : professional.specialty,
+          specialty,
           senasa_number: settings.showSenasa
             ? form.senasa_number.trim() || null
             : professional.senasa_number,

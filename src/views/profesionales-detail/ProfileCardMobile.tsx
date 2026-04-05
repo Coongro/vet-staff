@@ -1,11 +1,6 @@
-/**
- * Tarjeta de perfil del profesional para vista mobile.
- * Muestra avatar, nombre, rol, estado, email y telefono en layout horizontal.
- */
 import { getHostReact, getHostUI } from '@coongro/plugin-sdk';
 
 import type { VetProfessionalDetail } from '../../hooks/useVetProfessional.js';
-
 import { DEFAULT_STAFF_ROLE } from '../../lib/constants.js';
 
 import {

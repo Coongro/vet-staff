@@ -1,6 +1,3 @@
-/**
- * Card de especialidades del profesional.
- */
 import { getHostReact, getHostUI } from '@coongro/plugin-sdk';
 
 import { formatSpecialty } from '../../lib/specialties.js';

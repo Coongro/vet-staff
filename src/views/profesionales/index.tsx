@@ -1,8 +1,3 @@
-/**
- * Vista lista de profesionales veterinarios.
- * Usa DataTable con mobileRender, StaffBadge del plugin staff.
- * FormDialog integrado para crear profesionales (crea contact + staff + vet en cascada).
- */
 import { getHostReact, getHostUI, usePlugin, actions } from '@coongro/plugin-sdk';
 import { StaffBadge } from '@coongro/staff';
 

@@ -1,11 +1,6 @@
-/**
- * Sidebar de perfil del profesional para vista desktop.
- * Muestra avatar centrado, nombre, rol, estado, contacto y fecha de alta.
- */
 import { getHostReact, getHostUI } from '@coongro/plugin-sdk';
 
 import type { VetProfessionalDetail } from '../../hooks/useVetProfessional.js';
-
 import { DEFAULT_STAFF_ROLE } from '../../lib/constants.js';
 
 import {

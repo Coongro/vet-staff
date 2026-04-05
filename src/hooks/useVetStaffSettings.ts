@@ -1,6 +1,3 @@
-/**
- * Hook para leer settings del plugin vet-staff.
- */
 import { getHostReact, useSettings } from '@coongro/plugin-sdk';
 
 const React = getHostReact();
