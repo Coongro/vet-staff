@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Veterinario — Lista Mobile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cg-bg: #F6F5F1;
+      --cg-surface: #FFFFFF;
+      --cg-border: #E8E6E1;
+      --cg-text: #1A1918;
+      --cg-text-muted: #9B9893;
+      --cg-accent: #F5A800;
+      --cg-accent-hover: #E09800;
+      --cg-gold-lt: #FFFBF0;
+      --cg-danger: #DC2626;
+      --cg-danger-bg: #FEF2F2;
+      --cg-success: #16A34A;
+      --cg-warning: #F59E0B;
+      --cg-r-md: 8px;
+      --cg-r-lg: 12px;
+      --cg-r-xl: 18px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: var(--cg-bg);
+      color: var(--cg-text);
+      max-width: 414px;
+      margin: 0 auto;
+    }
+    h1, h2, h3 { font-family: 'Noto Serif JP', serif; }
+
+    .page { padding: 16px; }
+
+    /* Header */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .page-title { font-size: 20px; font-weight: 700; }
+    .page-subtitle { font-size: 12px; color: var(--cg-text-muted); margin-top: 2px; }
+
+    .btn-fab {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--cg-accent);
+      color: #fff;
+      border: none;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Stats row */
+    .stats-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .stat-card {
+      flex: 1;
+      background: var(--cg-surface);
+      border: 1px solid var(--cg-border);
+      border-radius: var(--cg-r-lg);
+      padding: 12px;
+      text-align: center;
+    }
+    .stat-value { font-family: 'Noto Serif JP', serif; font-size: 20px; font-weight: 700; }
+    .stat-label { font-size: 11px; color: var(--cg-text-muted); margin-top: 2px; }
+
+    /* Search */
+    .search-bar {
+      margin-bottom: 12px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 10px 12px 10px 36px;
+      border: 1px solid var(--cg-border);
+      border-radius: var(--cg-r-md);
+      font-size: 14px;
+      background: var(--cg-surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239B9893' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E") 12px center no-repeat;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--cg-accent); }
+
+    /* Filters */
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .filter-select {
+      flex: 1;
+      padding: 9px 28px 9px 10px;
+      border: 1px solid var(--cg-border);
+      border-radius: var(--cg-r-md);
+      font-size: 13px;
+      background: var(--cg-surface);
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239B9893' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+    }
+
+    /* Cards list */
+    .card-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .prof-card {
+      background: var(--cg-surface);
+      border: 1px solid var(--cg-border);
+      border-radius: var(--cg-r-xl);
+      padding: 14px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .prof-card:active { border-color: var(--cg-accent); }
+
+    .prof-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .avatar.blue { background: #3B82F6; }
+    .avatar.green { background: #10B981; }
+    .avatar.purple { background: #8B5CF6; }
+    .avatar.orange { background: #F97316; }
+    .avatar.pink { background: #EC4899; }
+    .avatar.inactive { background: #D1D5DB; }
+
+    .prof-name { font-weight: 500; font-size: 15px; }
+    .prof-contact { font-size: 12px; color: var(--cg-text-muted); }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+    .status-dot.active { background: var(--cg-success); }
+    .status-dot.inactive { background: var(--cg-text-muted); }
+
+    .prof-card-details {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .detail-label { font-size: 11px; color: var(--cg-text-muted); text-transform: uppercase; letter-spacing: 0.3px; }
+    .detail-value { font-size: 13px; }
+
+    .specialty-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--cg-gold-lt);
+      color: #92600A;
+    }
+
+    .prof-card.inactive-card .prof-name {
+      color: var(--cg-text-muted);
+      text-decoration: line-through;
+    }
+    .prof-card.inactive-card .specialty-tag {
+      background: #F5F5F4;
+      color: var(--cg-text-muted);
+    }
+
+    /* Pagination */
+    .pagination-info {
+      text-align: center;
+      padding: 16px;
+      font-size: 13px;
+      color: var(--cg-text-muted);
+    }
+
+    /* Skeleton */
+    @keyframes shimmer {
+      0% { background-position: -300px 0; }
+      100% { background-position: 300px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #EEECE7 25%, #F5F3EE 50%, #EEECE7 75%);
+      background-size: 600px 100%;
+      animation: shimmer 1.5s ease-in-out infinite;
+      border-radius: var(--cg-r-md);
+    }
+    .skel-circle { border-radius: 50%; }
+    .skel-line { height: 14px; }
+    .skel-line.short { width: 60%; }
+    .skel-line.tiny { width: 40%; height: 12px; }
+    .skel-tag { width: 80px; height: 20px; border-radius: 10px; }
+    .skel-stat { width: 28px; height: 22px; }
+
+    .skeleton-section { margin-top: 32px; border-top: 2px dashed var(--cg-border); padding-top: 24px; }
+    .skeleton-label { font-size: 12px; font-weight: 500; color: var(--cg-text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Personal</h1>
+        <p class="page-subtitle">Profesionales veterinarios</p>
+      </div>
+      <button class="btn-fab">+</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value">5</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">4</div>
+        <div class="stat-label">Activos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">1</div>
+        <div class="stat-label">Inactivos</div>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-bar">
+      <input type="text" class="search-input" placeholder="Buscar por nombre o matricula...">
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-row">
+      <select class="filter-select">
+        <option>Especialidad</option>
+        <option>Clinica Medica</option>
+        <option>Cirugia</option>
+        <option>Dermatologia</option>
+        <option>Cardiologia</option>
+        <option>Dx por Imagenes</option>
+      </select>
+      <select class="filter-select">
+        <option>Estado</option>
+        <option>Activos</option>
+        <option>Inactivos</option>
+      </select>
+    </div>
+
+    <!-- Cards -->
+    <div class="card-list">
+      <!-- Card 1 -->
+      <div class="prof-card">
+        <div class="prof-card-header">
+          <div class="avatar blue">MG</div>
+          <div>
+            <div class="prof-name">Dra. Maria Garcia</div>
+            <div class="prof-contact">maria.garcia@email.com</div>
+          </div>
+          <div class="status-dot active" title="Activo"></div>
+        </div>
+        <div class="prof-card-details">
+          <div class="detail-item">
+            <span class="detail-label">Especialidad</span>
+            <span class="specialty-tag">Clinica Medica</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Matricula</span>
+            <span class="detail-value">MP 12345 &middot; CVPBA</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="prof-card">
+        <div class="prof-card-header">
+          <div class="avatar green">CL</div>
+          <div>
+            <div class="prof-name">Dr. Carlos Lopez</div>
+            <div class="prof-contact">carlos.lopez@email.com</div>
+          </div>
+          <div class="status-dot active" title="Activo"></div>
+        </div>
+        <div class="prof-card-details">
+          <div class="detail-item">
+            <span class="detail-label">Especialidad</span>
+            <span class="specialty-tag">Cirugia</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Matricula</span>
+            <span class="detail-value">MP 67890 &middot; CVPBA</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="prof-card">
+        <div class="prof-card-header">
+          <div class="avatar purple">AR</div>
+          <div>
+            <div class="prof-name">Dra. Ana Rodriguez</div>
+            <div class="prof-contact">ana.rodriguez@email.com</div>
+          </div>
+          <div class="status-dot active" title="Activo"></div>
+        </div>
+        <div class="prof-card-details">
+          <div class="detail-item">
+            <span class="detail-label">Especialidad</span>
+            <span class="specialty-tag">Dermatologia</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Matricula</span>
+            <span class="detail-value">MP 11223 &middot; COVET Cba</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="prof-card">
+        <div class="prof-card-header">
+          <div class="avatar orange">PM</div>
+          <div>
+            <div class="prof-name">Dr. Pedro Martinez</div>
+            <div class="prof-contact">pedro.martinez@email.com</div>
+          </div>
+          <div class="status-dot active" title="Activo"></div>
+        </div>
+        <div class="prof-card-details">
+          <div class="detail-item">
+            <span class="detail-label">Especialidad</span>
+            <span class="specialty-tag">Cardiologia</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Matricula</span>
+            <span class="detail-value">MP 44556 &middot; CVPBA</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5 - Inactive -->
+      <div class="prof-card inactive-card">
+        <div class="prof-card-header">
+          <div class="avatar inactive">LF</div>
+          <div>
+            <div class="prof-name">Dra. Laura Fernandez</div>
+            <div class="prof-contact">laura.fernandez@email.com</div>
+          </div>
+          <div class="status-dot inactive" title="Inactivo"></div>
+        </div>
+        <div class="prof-card-details">
+          <div class="detail-item">
+            <span class="detail-label">Especialidad</span>
+            <span class="specialty-tag">Dx por Imagenes</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Matricula</span>
+            <span class="detail-value" style="color:var(--cg-text-muted);">MP 77889 &middot; CVPBA</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pagination-info">Mostrando 5 de 5 profesionales</div>
+
+    <!-- ==================== SKELETON STATE ==================== -->
+    <div class="skeleton-section">
+      <div class="skeleton-label">Estado: Cargando</div>
+
+      <!-- Stats skeleton -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="skeleton skel-stat" style="margin:0 auto 4px"></div>
+          <div class="skeleton skel-line tiny" style="margin:0 auto;width:50%"></div>
+        </div>
+        <div class="stat-card">
+          <div class="skeleton skel-stat" style="margin:0 auto 4px"></div>
+          <div class="skeleton skel-line tiny" style="margin:0 auto;width:50%"></div>
+        </div>
+        <div class="stat-card">
+          <div class="skeleton skel-stat" style="margin:0 auto 4px"></div>
+          <div class="skeleton skel-line tiny" style="margin:0 auto;width:50%"></div>
+        </div>
+      </div>
+
+      <!-- Card skeletons -->
+      <div class="card-list">
+        <div class="prof-card">
+          <div class="prof-card-header">
+            <div class="skeleton skel-circle" style="width:40px;height:40px"></div>
+            <div style="flex:1">
+              <div class="skeleton skel-line" style="width:70%;margin-bottom:6px"></div>
+              <div class="skeleton skel-line tiny"></div>
+            </div>
+            <div class="skeleton skel-circle" style="width:8px;height:8px"></div>
+          </div>
+          <div class="prof-card-details">
+            <div class="detail-item">
+              <div class="skeleton skel-line tiny" style="width:60px;margin-bottom:4px"></div>
+              <div class="skeleton skel-tag"></div>
+            </div>
+            <div class="detail-item">
+              <div class="skeleton skel-line tiny" style="width:50px;margin-bottom:4px"></div>
+              <div class="skeleton skel-line" style="width:120px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="prof-card">
+          <div class="prof-card-header">
+            <div class="skeleton skel-circle" style="width:40px;height:40px"></div>
+            <div style="flex:1">
+              <div class="skeleton skel-line" style="width:55%;margin-bottom:6px"></div>
+              <div class="skeleton skel-line tiny"></div>
+            </div>
+            <div class="skeleton skel-circle" style="width:8px;height:8px"></div>
+          </div>
+          <div class="prof-card-details">
+            <div class="detail-item">
+              <div class="skeleton skel-line tiny" style="width:60px;margin-bottom:4px"></div>
+              <div class="skeleton skel-tag"></div>
+            </div>
+            <div class="detail-item">
+              <div class="skeleton skel-line tiny" style="width:50px;margin-bottom:4px"></div>
+              <div class="skeleton skel-line" style="width:100px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="prof-card">
+          <div class="prof-card-header">
+            <div class="skeleton skel-circle" style="width:40px;height:40px"></div>
+            <div style="flex:1">
+              <div class="skeleton skel-line" style="width:65%;margin-bottom:6px"></div>
+              <div class="skeleton skel-line tiny"></div>
+            </div>
+            <div class="skeleton skel-circle" style="width:8px;height:8px"></div>
+          </div>
+          <div class="prof-card-details">
+            <div class="detail-item">
+              <div class="skeleton skel-line tiny" style="width:60px;margin-bottom:4px"></div>
+              <div class="skeleton skel-tag"></div>
+            </div>
+            <div class="detail-item">
+              <div class="skeleton skel-line tiny" style="width:50px;margin-bottom:4px"></div>
+              <div class="skeleton skel-line" style="width:110px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
