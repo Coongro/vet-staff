@@ -14,8 +14,6 @@ const React = getHostReact();
 const UI = getHostUI();
 const h = React.createElement;
 
-const NO_DATA = NO_DATA;
-
 // --- Mobile: filas key-value ---
 
 interface DataRow {
@@ -40,7 +38,7 @@ function buildDataRows(data: VetProfessional, settings: VetStaffSettings): DataR
   if (settings.senasaEnabled) {
     rows.push({
       label: 'SENASA',
-      value: data.senasa_number || NO_DATA,
+      value: data.senasa_number || 'No registrado',
       mono: Boolean(data.senasa_number),
     });
   }
@@ -68,7 +66,7 @@ export function ProfessionalDataMobile(props: {
       )
     ),
     ...rows.map((row) => {
-      const isEmpty = row.value === '\u2014' || row.value === NO_DATA;
+      const isEmpty = row.value === '\u2014' || row.value === 'No registrado';
       return h(
         'div',
         {
@@ -160,7 +158,7 @@ function SenasaCell(props: { data: VetProfessional; settings: VetStaffSettings }
             : { color: MUTED_COLOR }),
         },
       },
-      data.senasa_number || NO_DATA
+      data.senasa_number || 'No registrado'
     )
   );
 }
