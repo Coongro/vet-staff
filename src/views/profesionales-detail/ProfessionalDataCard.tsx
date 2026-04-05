@@ -1,8 +1,3 @@
-/**
- * Card de datos profesionales (matricula, colegio, SENASA).
- * Version mobile: filas key-value apiladas.
- * Version desktop: grid bento de 3 columnas.
- */
 import { getHostReact, getHostUI } from '@coongro/plugin-sdk';
 
 import type { VetStaffSettings } from '../../hooks/useVetStaffSettings.js';
@@ -14,35 +9,34 @@ const React = getHostReact();
 const UI = getHostUI();
 const h = React.createElement;
 
-// --- Mobile: filas key-value ---
-
-interface DataRow {
+interface DataCell {
   label: string;
   value: string;
   mono: boolean;
 }
 
-function buildDataRows(data: VetProfessional, settings: VetStaffSettings): DataRow[] {
-  const rows: DataRow[] = [
-    {
+function buildCells(data: VetProfessional, settings: VetStaffSettings): DataCell[] {
+  const cells: DataCell[] = [];
+  if (settings.showLicense) {
+    cells.push({
       label: 'Matricula',
-      value: settings.licensePrefix + ' ' + data.license_number,
-      mono: true,
-    },
-    {
+      value: data.license_number || '\u2014',
+      mono: Boolean(data.license_number),
+    });
+    cells.push({
       label: 'Colegio emisor',
       value: data.license_college || '\u2014',
       mono: false,
-    },
-  ];
-  if (settings.senasaEnabled) {
-    rows.push({
+    });
+  }
+  if (settings.showSenasa) {
+    cells.push({
       label: 'SENASA',
       value: data.senasa_number || 'No registrado',
       mono: Boolean(data.senasa_number),
     });
   }
-  return rows;
+  return cells;
 }
 
 export function ProfessionalDataMobile(props: {
@@ -50,7 +44,9 @@ export function ProfessionalDataMobile(props: {
   settings: VetStaffSettings;
 }) {
   const { data, settings } = props;
-  const rows = buildDataRows(data, settings);
+  const cells = buildCells(data, settings);
+
+  if (cells.length === 0) return null;
 
   return h(
     UI.Card,
@@ -65,12 +61,12 @@ export function ProfessionalDataMobile(props: {
         'Datos profesionales'
       )
     ),
-    ...rows.map((row) => {
-      const isEmpty = row.value === '\u2014' || row.value === 'No registrado';
+    ...cells.map((cell) => {
+      const isEmpty = cell.value === '\u2014' || cell.value === 'No registrado';
       return h(
         'div',
         {
-          key: row.label,
+          key: cell.label,
           style: {
             display: 'flex',
             justifyContent: 'space-between',
@@ -79,7 +75,7 @@ export function ProfessionalDataMobile(props: {
             borderTop: BORDER_TOP,
           },
         },
-        h('span', { style: { fontSize: 12, color: MUTED_COLOR } }, row.label),
+        h('span', { style: { fontSize: 12, color: MUTED_COLOR } }, cell.label),
         h(
           'span',
           {
@@ -87,18 +83,16 @@ export function ProfessionalDataMobile(props: {
               fontSize: 14,
               fontWeight: 500,
               textAlign: 'right' as const,
-              fontFamily: row.mono ? MONO_FONT : undefined,
+              fontFamily: cell.mono ? MONO_FONT : undefined,
               color: isEmpty ? MUTED_COLOR : undefined,
             },
           },
-          row.value
+          cell.value
         )
       );
     })
   );
 }
-
-// --- Desktop: grid bento ---
 
 const BENTO_LABEL_STYLE = {
   ...LABEL_STYLE,
@@ -130,42 +124,14 @@ function BentoCell(props: { label: string; value: string; mono?: boolean; showBo
   );
 }
 
-function SenasaCell(props: { data: VetProfessional; settings: VetStaffSettings }) {
-  const { data, settings } = props;
-
-  if (!settings.senasaEnabled) {
-    return h(
-      'div',
-      { style: { padding: '16px 20px' } },
-      h('div', { style: BENTO_LABEL_STYLE }, 'SENASA'),
-      h('div', { style: { fontSize: 13, color: MUTED_COLOR } }, 'No habilitado')
-    );
-  }
-
-  const hasSenasa = Boolean(data.senasa_number);
-  return h(
-    'div',
-    { style: { padding: '16px 20px' } },
-    h('div', { style: BENTO_LABEL_STYLE }, 'SENASA'),
-    h(
-      'div',
-      {
-        style: {
-          fontSize: 15,
-          fontWeight: 500,
-          ...(hasSenasa ? { fontFamily: MONO_FONT } : { color: MUTED_COLOR }),
-        },
-      },
-      data.senasa_number || 'No registrado'
-    )
-  );
-}
-
 export function ProfessionalDataDesktop(props: {
   data: VetProfessional;
   settings: VetStaffSettings;
 }) {
   const { data, settings } = props;
+  const cells = buildCells(data, settings);
+
+  if (cells.length === 0) return null;
 
   return h(
     UI.Card,
@@ -185,22 +151,19 @@ export function ProfessionalDataDesktop(props: {
       {
         style: {
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr',
+          gridTemplateColumns: `repeat(${cells.length}, 1fr)`,
           borderTop: BORDER_TOP,
         },
       },
-      h(BentoCell, {
-        label: 'Matricula',
-        value: settings.licensePrefix + ' ' + data.license_number,
-        mono: true,
-        showBorder: true,
-      }),
-      h(BentoCell, {
-        label: 'Colegio emisor',
-        value: data.license_college || '\u2014',
-        showBorder: true,
-      }),
-      h(SenasaCell, { data, settings })
+      ...cells.map((cell, i) =>
+        h(BentoCell, {
+          key: cell.label,
+          label: cell.label,
+          value: cell.value,
+          mono: cell.mono,
+          showBorder: i < cells.length - 1,
+        })
+      )
     )
   );
 }

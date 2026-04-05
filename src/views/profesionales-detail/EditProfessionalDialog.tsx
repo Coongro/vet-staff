@@ -1,6 +1,3 @@
-/**
- * Dialog para editar los datos profesionales de un veterinario.
- */
 import { getHostReact, getHostUI, usePlugin, actions } from '@coongro/plugin-sdk';
 
 import type { VetStaffSettings } from '../../hooks/useVetStaffSettings.js';
@@ -47,7 +44,7 @@ export function EditProfessionalDialog(props: {
 
   const [form, setForm] = useState<EditFormData>(() => buildInitialForm(professional));
   const [saving, setSaving] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Partial<Record<string, string>>>({});
 
   // Sincronizar form cuando cambia el profesional
   React.useEffect(() => {
@@ -57,18 +54,13 @@ export function EditProfessionalDialog(props: {
 
   const updateField = useCallback((key: string, value: unknown) => {
     setForm((prev: EditFormData) => ({ ...prev, [key]: value }));
-    setErrors((prev: Record<string, string>) => {
-      const next = { ...prev };
-      delete next[key];
-      return next;
-    });
+    setErrors((prev) => ({ ...prev, [key]: undefined }));
   }, []);
 
   const handleSave = useCallback(async () => {
-    const errs: Record<string, string> = {};
-    if (!form.license_number.trim()) errs.license_number = 'La matricula es obligatoria';
-    if (settings.senasaEnabled && settings.senasaRequired && !form.senasa_number.trim()) {
-      errs.senasa_number = 'El numero SENASA es obligatorio';
+    const errs: Partial<Record<string, string>> = {};
+    if (settings.showLicense && !form.license_number.trim()) {
+      errs.license_number = 'La matricula es obligatoria';
     }
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
@@ -77,13 +69,26 @@ export function EditProfessionalDialog(props: {
 
     setSaving(true);
     try {
+      let specialty: string | null;
+      if (!settings.showSpecialty) {
+        specialty = professional.specialty;
+      } else {
+        specialty = form.specialties.length > 0 ? form.specialties.join(',') : null;
+      }
+
       await actions.execute('vet-staff.professionals.update', {
         id: professional.id,
         data: {
-          license_number: form.license_number.trim(),
-          license_college: form.license_college.trim() || null,
-          specialty: form.specialties.length > 0 ? form.specialties.join(',') : null,
-          senasa_number: form.senasa_number.trim() || null,
+          license_number: settings.showLicense
+            ? form.license_number.trim()
+            : professional.license_number,
+          license_college: settings.showLicense
+            ? form.license_college.trim() || null
+            : professional.license_college,
+          specialty,
+          senasa_number: settings.showSenasa
+            ? form.senasa_number.trim() || null
+            : professional.senasa_number,
           is_active: form.is_active,
         },
       });
@@ -95,11 +100,13 @@ export function EditProfessionalDialog(props: {
     } finally {
       setSaving(false);
     }
-  }, [professional.id, form, settings, toast, onOpenChange, onSaved]);
+  }, [professional, form, settings, toast, onOpenChange, onSaved]);
 
   const handleClose = useCallback(() => {
     if (!saving) onOpenChange(false);
   }, [saving, onOpenChange]);
+
+  const hasVisibleFields = settings.showLicense || settings.showSpecialty || settings.showSenasa;
 
   return h(
     UI.FormDialog,
@@ -122,24 +129,29 @@ export function EditProfessionalDialog(props: {
     h(
       'div',
       { className: 'flex flex-col gap-4' },
-      h(LicenseFields, {
-        licenseNumber: form.license_number,
-        licenseCollege: form.license_college,
-        licenseError: errors.license_number,
-        onLicenseNumberChange: (v: string) => updateField('license_number', v),
-        onLicenseCollegeChange: (v: string) => updateField('license_college', v),
-      }),
-      h(SpecialtiesField, {
-        values: form.specialties,
-        onValuesChange: (vals: string[]) => updateField('specialties', vals),
-      }),
-      h(SenasaField, {
-        settings,
-        value: form.senasa_number,
-        error: errors.senasa_number,
-        onChange: (v: string) => updateField('senasa_number', v),
-      }),
-      h(UI.Separator, null),
+      settings.showLicense
+        ? h(LicenseFields, {
+            licenseNumber: form.license_number,
+            licenseCollege: form.license_college,
+            licenseError: errors.license_number,
+            onLicenseNumberChange: (v: string) => updateField('license_number', v),
+            onLicenseCollegeChange: (v: string) => updateField('license_college', v),
+          })
+        : null,
+      settings.showSpecialty
+        ? h(SpecialtiesField, {
+            values: form.specialties,
+            onValuesChange: (vals: string[]) => updateField('specialties', vals),
+          })
+        : null,
+      settings.showSenasa
+        ? h(SenasaField, {
+            value: form.senasa_number,
+            error: errors.senasa_number,
+            onChange: (v: string) => updateField('senasa_number', v),
+          })
+        : null,
+      hasVisibleFields ? h(UI.Separator, null) : null,
       h(ActiveToggle, {
         checked: form.is_active,
         onCheckedChange: (checked: boolean) => updateField('is_active', checked),
