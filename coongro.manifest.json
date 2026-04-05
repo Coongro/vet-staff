@@ -1,0 +1,151 @@
+{
+  "id": "vet-staff",
+  "version": "0.1.0",
+  "apiVersion": "2.0",
+  "assets": {
+    "styles": [
+      "./dist/assets/tailwind.css",
+      "./dist/assets/fontawesome/css/all.min.css"
+    ]
+  },
+  "contributes": {
+    "menus": [
+      {
+        "path": "Personal",
+        "icon": "assets/icons/staff.svg",
+        "color": "#8B5CF6"
+      },
+      {
+        "path": "Personal/Profesionales",
+        "order": 1,
+        "viewId": "vet-staff.profesionales.open"
+      }
+    ],
+    "views": [
+      {
+        "id": "vet-staff.profesionales.open",
+        "title": "Profesionales",
+        "component": "./dist/views/profesionales/index.js",
+        "export": "ProfesionalesView"
+      },
+      {
+        "id": "vet-staff.profesionales-detail.open",
+        "title": "Profesional",
+        "component": "./dist/views/profesionales-detail/index.js",
+        "export": "ProfesionalesDetailView"
+      }
+    ],
+    "repositories": [
+      {
+        "module": "./dist/repositories/vet-professional.repository.js",
+        "export": "VetProfessionalRepository",
+        "prefix": "vet-staff.professionals"
+      }
+    ],
+    "settings": {
+      "groups": [
+        {
+          "id": "vet-staff",
+          "label": "Vet Staff",
+          "order": 50
+        }
+      ],
+      "pages": [
+        {
+          "id": "vet-staff.general",
+          "group": "vet-staff",
+          "label": "General",
+          "icon": "assets/icons/general.svg",
+          "order": 10
+        }
+      ],
+      "sections": [
+        {
+          "id": "vet-staff.general.main",
+          "page": "vet-staff.general",
+          "label": "General",
+          "order": 10,
+          "items": [
+            {
+              "key": "vet-staff.license.prefix",
+              "type": "enum",
+              "label": "Prefijo de matricula",
+              "description": "Prefijo que se muestra antes del numero de matricula",
+              "default": "MP",
+              "options": [
+                "MP",
+                "MV",
+                "MN"
+              ],
+              "tags": [
+                "vet-staff",
+                "license",
+                "prefix",
+                "prefijo",
+                "matricula"
+              ]
+            },
+            {
+              "key": "vet-staff.license.defaultCollege",
+              "type": "string",
+              "label": "Colegio emisor por defecto",
+              "description": "Colegio profesional que se pre-completa al crear un nuevo profesional (ej: CVPBA, COVET Cordoba)",
+              "default": "",
+              "tags": [
+                "vet-staff",
+                "license",
+                "defaultcollege",
+                "colegio",
+                "emisor",
+                "por",
+                "defecto"
+              ]
+            },
+            {
+              "key": "vet-staff.senasa.enabled",
+              "type": "boolean",
+              "label": "Habilitar campo SENASA",
+              "description": "Mostrar campo de acreditacion SENASA en el formulario de profesional",
+              "default": false,
+              "tags": [
+                "vet-staff",
+                "senasa",
+                "enabled",
+                "habilitar",
+                "campo"
+              ]
+            },
+            {
+              "key": "vet-staff.senasa.required",
+              "type": "boolean",
+              "label": "SENASA obligatorio",
+              "description": "Requerir numero SENASA al crear un profesional (solo aplica si SENASA esta habilitado)",
+              "default": false,
+              "tags": [
+                "vet-staff",
+                "senasa",
+                "required",
+                "obligatorio"
+              ]
+            },
+            {
+              "key": "vet-staff.showInactive",
+              "type": "boolean",
+              "label": "Mostrar inactivos por defecto",
+              "description": "Incluir profesionales inactivos en la lista principal sin filtrar",
+              "default": true,
+              "tags": [
+                "vet-staff",
+                "showinactive",
+                "mostrar",
+                "inactivos",
+                "por",
+                "defecto"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

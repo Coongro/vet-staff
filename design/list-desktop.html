@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Veterinario — Lista Desktop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cg-bg: #F6F5F1;
+      --cg-surface: #FFFFFF;
+      --cg-border: #E8E6E1;
+      --cg-text: #1A1918;
+      --cg-text-muted: #9B9893;
+      --cg-accent: #F5A800;
+      --cg-accent-hover: #E09800;
+      --cg-gold-lt: #FFFBF0;
+      --cg-danger: #DC2626;
+      --cg-danger-bg: #FEF2F2;
+      --cg-success: #16A34A;
+      --cg-warning: #F59E0B;
+      --cg-r-md: 8px;
+      --cg-r-lg: 12px;
+      --cg-r-xl: 18px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: var(--cg-bg);
+      color: var(--cg-text);
+    }
+    h1, h2, h3 { font-family: 'Noto Serif JP', serif; }
+
+    .page { max-width: 1280px; margin: 0 auto; padding: 32px 24px; }
+
+    /* Header */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .page-title { font-size: 24px; font-weight: 700; }
+    .page-subtitle { font-size: 14px; color: var(--cg-text-muted); margin-top: 2px; }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: var(--cg-accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--cg-r-md);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: var(--cg-accent-hover); }
+
+    /* Stats row */
+    .stats-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      flex: 1;
+      background: var(--cg-surface);
+      border: 1px solid var(--cg-border);
+      border-radius: var(--cg-r-xl);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--cg-r-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .stat-icon.total { background: var(--cg-gold-lt); }
+    .stat-icon.active { background: #F0FDF4; }
+    .stat-icon.inactive { background: #F5F5F4; }
+    .stat-value { font-family: 'Noto Serif JP', serif; font-size: 22px; font-weight: 700; }
+    .stat-label { font-size: 12px; color: var(--cg-text-muted); }
+
+    /* Filter bar */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .search-input {
+      flex: 1;
+      max-width: 320px;
+      padding: 9px 12px 9px 36px;
+      border: 1px solid var(--cg-border);
+      border-radius: var(--cg-r-md);
+      font-size: 14px;
+      background: var(--cg-surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239B9893' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E") 12px center no-repeat;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .search-input:focus { border-color: var(--cg-accent); }
+    .search-input::placeholder { color: var(--cg-text-muted); }
+
+    .filter-select {
+      padding: 9px 32px 9px 12px;
+      border: 1px solid var(--cg-border);
+      border-radius: var(--cg-r-md);
+      font-size: 14px;
+      background: var(--cg-surface);
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239B9893' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+
+    /* Table */
+    .table-card {
+      background: var(--cg-surface);
+      border: 1px solid var(--cg-border);
+      border-radius: var(--cg-r-xl);
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--cg-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--cg-border);
+      background: var(--cg-surface);
+    }
+    tbody td {
+      padding: 14px 16px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--cg-border);
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #FAFAF8; cursor: pointer; }
+
+    /* Professional row */
+    .prof-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .avatar.blue { background: #3B82F6; }
+    .avatar.green { background: #10B981; }
+    .avatar.purple { background: #8B5CF6; }
+    .avatar.orange { background: #F97316; }
+    .avatar.pink { background: #EC4899; }
+    .avatar.inactive { background: #D1D5DB; }
+
+    .prof-name { font-weight: 500; font-size: 14px; }
+    .prof-contact { font-size: 12px; color: var(--cg-text-muted); }
+
+    .specialty-tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--cg-gold-lt);
+      color: #92600A;
+    }
+
+    .license-num {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 13px;
+      color: var(--cg-text);
+    }
+    .license-college {
+      font-size: 11px;
+      color: var(--cg-text-muted);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .status-badge.active { background: #F0FDF4; color: var(--cg-success); }
+    .status-badge.inactive { background: #F5F5F4; color: var(--cg-text-muted); }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+    .status-badge.active .status-dot { background: var(--cg-success); }
+    .status-badge.inactive .status-dot { background: var(--cg-text-muted); }
+
+    .actions-cell {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      border-radius: var(--cg-r-md);
+      cursor: pointer;
+      color: var(--cg-text-muted);
+      font-size: 14px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .btn-icon:hover { background: #F0EFEB; color: var(--cg-text); }
+
+    /* Pagination */
+    .table-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--cg-text-muted);
+    }
+    .pagination {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .page-btn {
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--cg-border);
+      background: var(--cg-surface);
+      border-radius: var(--cg-r-md);
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.15s;
+    }
+    .page-btn:hover { border-color: var(--cg-accent); color: var(--cg-accent); }
+    .page-btn.active { background: var(--cg-accent); color: #fff; border-color: var(--cg-accent); }
+    .page-btn:disabled { opacity: 0.4; cursor: default; }
+
+    /* Skeleton */
+    @keyframes shimmer {
+      0% { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #EEECE7 25%, #F5F3EE 50%, #EEECE7 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.5s ease-in-out infinite;
+      border-radius: var(--cg-r-md);
+    }
+    .skel-circle { border-radius: 50%; }
+    .skel-line { height: 14px; }
+    .skel-line.short { width: 60%; }
+    .skel-line.medium { width: 80%; }
+    .skel-line.tiny { width: 40%; height: 12px; }
+    .skel-tag { width: 90px; height: 22px; border-radius: 12px; }
+    .skel-badge { width: 70px; height: 24px; border-radius: 12px; }
+    .skel-stat { width: 32px; height: 26px; }
+
+    .skeleton-section { margin-top: 48px; border-top: 2px dashed var(--cg-border); padding-top: 32px; }
+    .skeleton-label { font-size: 13px; font-weight: 500; color: var(--cg-text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Personal</h1>
+        <p class="page-subtitle">Profesionales veterinarios del equipo</p>
+      </div>
+      <button class="btn-primary">
+        [icon:Plus] Nuevo profesional
+      </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon total">[icon:Users]</div>
+        <div>
+          <div class="stat-value">5</div>
+          <div class="stat-label">Total profesionales</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon active">[icon:CheckCircle]</div>
+        <div>
+          <div class="stat-value">4</div>
+          <div class="stat-label">Activos</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon inactive">[icon:Pause]</div>
+        <div>
+          <div class="stat-value">1</div>
+          <div class="stat-label">Inactivos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <input type="text" class="search-input" placeholder="Buscar por nombre o matricula...">
+      <select class="filter-select">
+        <option>Todas las especialidades</option>
+        <option>Clinica Medica</option>
+        <option>Cirugia</option>
+        <option>Dermatologia</option>
+        <option>Cardiologia</option>
+        <option>Diagnostico por Imagenes</option>
+      </select>
+      <select class="filter-select">
+        <option>Todos los estados</option>
+        <option>Activos</option>
+        <option>Inactivos</option>
+      </select>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Profesional</th>
+            <th>Especialidad</th>
+            <th>Matricula</th>
+            <th>Estado</th>
+            <th style="width:80px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="prof-info">
+                <div class="avatar blue">MG</div>
+                <div>
+                  <div class="prof-name">Dra. Maria Garcia</div>
+                  <div class="prof-contact">maria.garcia@email.com</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="specialty-tag">Clinica Medica</span></td>
+            <td>
+              <div class="license-num">MP 12345</div>
+              <div class="license-college">CVPBA</div>
+            </td>
+            <td><span class="status-badge active"><span class="status-dot"></span> Activo</span></td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn-icon" title="Editar">[icon:Edit]</button>
+                <button class="btn-icon" title="Mas opciones">[icon:MoreV]</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="prof-info">
+                <div class="avatar green">CL</div>
+                <div>
+                  <div class="prof-name">Dr. Carlos Lopez</div>
+                  <div class="prof-contact">carlos.lopez@email.com</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="specialty-tag">Cirugia</span></td>
+            <td>
+              <div class="license-num">MP 67890</div>
+              <div class="license-college">CVPBA</div>
+            </td>
+            <td><span class="status-badge active"><span class="status-dot"></span> Activo</span></td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn-icon" title="Editar">[icon:Edit]</button>
+                <button class="btn-icon" title="Mas opciones">[icon:MoreV]</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="prof-info">
+                <div class="avatar purple">AR</div>
+                <div>
+                  <div class="prof-name">Dra. Ana Rodriguez</div>
+                  <div class="prof-contact">ana.rodriguez@email.com</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="specialty-tag">Dermatologia</span></td>
+            <td>
+              <div class="license-num">MP 11223</div>
+              <div class="license-college">COVET Cordoba</div>
+            </td>
+            <td><span class="status-badge active"><span class="status-dot"></span> Activo</span></td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn-icon" title="Editar">[icon:Edit]</button>
+                <button class="btn-icon" title="Mas opciones">[icon:MoreV]</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="prof-info">
+                <div class="avatar orange">PM</div>
+                <div>
+                  <div class="prof-name">Dr. Pedro Martinez</div>
+                  <div class="prof-contact">pedro.martinez@email.com</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="specialty-tag">Cardiologia</span></td>
+            <td>
+              <div class="license-num">MP 44556</div>
+              <div class="license-college">CVPBA</div>
+            </td>
+            <td><span class="status-badge active"><span class="status-dot"></span> Activo</span></td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn-icon" title="Editar">[icon:Edit]</button>
+                <button class="btn-icon" title="Mas opciones">[icon:MoreV]</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="prof-info">
+                <div class="avatar inactive">LF</div>
+                <div>
+                  <div class="prof-name" style="color: var(--cg-text-muted); text-decoration: line-through;">Dra. Laura Fernandez</div>
+                  <div class="prof-contact">laura.fernandez@email.com</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="specialty-tag" style="background:#F5F5F4; color:var(--cg-text-muted);">Diagnostico por Imagenes</span></td>
+            <td>
+              <div class="license-num" style="color:var(--cg-text-muted);">MP 77889</div>
+              <div class="license-college">CVPBA</div>
+            </td>
+            <td><span class="status-badge inactive"><span class="status-dot"></span> Inactivo</span></td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn-icon" title="Editar">[icon:Edit]</button>
+                <button class="btn-icon" title="Mas opciones">[icon:MoreV]</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="table-footer">
+        <span>Mostrando 1-5 de 5 profesionales</span>
+        <div class="pagination">
+          <button class="page-btn" disabled>&lt;</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn" disabled>&gt;</button>
+        </div>
+      </div>
+    </div>
+    <!-- ==================== SKELETON STATE ==================== -->
+    <div class="skeleton-section">
+      <div class="skeleton-label">Estado: Cargando</div>
+
+      <!-- Stats skeleton -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="skeleton skel-circle" style="width:40px;height:40px"></div>
+          <div>
+            <div class="skeleton skel-stat" style="margin-bottom:6px"></div>
+            <div class="skeleton skel-line tiny"></div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="skeleton skel-circle" style="width:40px;height:40px"></div>
+          <div>
+            <div class="skeleton skel-stat" style="margin-bottom:6px"></div>
+            <div class="skeleton skel-line tiny"></div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="skeleton skel-circle" style="width:40px;height:40px"></div>
+          <div>
+            <div class="skeleton skel-stat" style="margin-bottom:6px"></div>
+            <div class="skeleton skel-line tiny"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table skeleton -->
+      <div class="table-card" style="margin-top:16px">
+        <table>
+          <thead>
+            <tr>
+              <th>Profesional</th>
+              <th>Especialidad</th>
+              <th>Matricula</th>
+              <th>Estado</th>
+              <th style="width:80px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="prof-info">
+                  <div class="skeleton skel-circle" style="width:36px;height:36px"></div>
+                  <div style="flex:1">
+                    <div class="skeleton skel-line medium" style="margin-bottom:6px"></div>
+                    <div class="skeleton skel-line tiny"></div>
+                  </div>
+                </div>
+              </td>
+              <td><div class="skeleton skel-tag"></div></td>
+              <td>
+                <div class="skeleton skel-line short" style="margin-bottom:4px"></div>
+                <div class="skeleton skel-line tiny" style="width:30%"></div>
+              </td>
+              <td><div class="skeleton skel-badge"></div></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="prof-info">
+                  <div class="skeleton skel-circle" style="width:36px;height:36px"></div>
+                  <div style="flex:1">
+                    <div class="skeleton skel-line" style="width:70%;margin-bottom:6px"></div>
+                    <div class="skeleton skel-line tiny"></div>
+                  </div>
+                </div>
+              </td>
+              <td><div class="skeleton skel-tag"></div></td>
+              <td>
+                <div class="skeleton skel-line short" style="margin-bottom:4px"></div>
+                <div class="skeleton skel-line tiny" style="width:30%"></div>
+              </td>
+              <td><div class="skeleton skel-badge"></div></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="prof-info">
+                  <div class="skeleton skel-circle" style="width:36px;height:36px"></div>
+                  <div style="flex:1">
+                    <div class="skeleton skel-line" style="width:65%;margin-bottom:6px"></div>
+                    <div class="skeleton skel-line tiny"></div>
+                  </div>
+                </div>
+              </td>
+              <td><div class="skeleton skel-tag"></div></td>
+              <td>
+                <div class="skeleton skel-line short" style="margin-bottom:4px"></div>
+                <div class="skeleton skel-line tiny" style="width:30%"></div>
+              </td>
+              <td><div class="skeleton skel-badge"></div></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
