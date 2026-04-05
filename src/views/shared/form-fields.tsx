@@ -1,10 +1,5 @@
-/**
- * Campos de formulario reutilizables para crear/editar profesionales.
- * Compartidos entre CreateProfessionalDialog y EditProfessionalDialog.
- */
 import { getHostReact, getHostUI } from '@coongro/plugin-sdk';
 
-import type { VetStaffSettings } from '../../hooks/useVetStaffSettings.js';
 import { SPECIALTIES, formatSpecialty } from '../../lib/specialties.js';
 
 const React = getHostReact();
@@ -97,7 +92,7 @@ export function LicenseFields(props: {
       h(UI.Input, {
         value: props.licenseNumber,
         onChange: (e: { target: { value: string } }) => props.onLicenseNumberChange(e.target.value),
-        placeholder: 'Ej: 12345',
+        placeholder: 'Ej: MP 12345',
       }),
       h(FieldError, { message: props.licenseError })
     ),
@@ -136,13 +131,10 @@ export function SpecialtiesField(props: {
 }
 
 export function SenasaField(props: {
-  settings: VetStaffSettings;
   value: string;
   error?: string;
   onChange: (value: string) => void;
 }) {
-  if (!props.settings.senasaEnabled) return null;
-
   return h(
     'div',
     null,
@@ -150,9 +142,7 @@ export function SenasaField(props: {
       'label',
       { className: LABEL_CLASS },
       'SENASA',
-      props.settings.senasaRequired
-        ? h(RequiredMark, null)
-        : h('span', { className: 'text-cg-text-muted ml-1' }, '(opcional)')
+      h('span', { className: 'text-cg-text-muted ml-1' }, '(opcional)')
     ),
     h(UI.Input, {
       value: props.value,

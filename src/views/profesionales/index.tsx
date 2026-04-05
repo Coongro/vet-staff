@@ -1,13 +1,10 @@
-/**
- * Vista lista de profesionales veterinarios.
- * Usa DataTable con mobileRender, StaffBadge del plugin staff.
- * FormDialog integrado para crear profesionales (crea contact + staff + vet en cascada).
- */
 import { getHostReact, getHostUI, usePlugin, actions } from '@coongro/plugin-sdk';
 import { StaffBadge } from '@coongro/staff';
 
 import { useVetProfessionals } from '../../hooks/useVetProfessionals.js';
+import type { VetStaffSettings } from '../../hooks/useVetStaffSettings.js';
 import { useVetStaffSettings } from '../../hooks/useVetStaffSettings.js';
+import { DEFAULT_STAFF_ROLE } from '../../lib/constants.js';
 import { SPECIALTIES, formatSpecialty } from '../../lib/specialties.js';
 import type { VetProfessional } from '../../types/vet-professional.js';
 import {
@@ -52,16 +49,13 @@ const EMPTY_FORM: CreateFormData = {
 function CreateProfessionalDialog(props: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  settings: ReturnType<typeof useVetStaffSettings>['settings'];
+  settings: VetStaffSettings;
   onCreated: () => void;
 }) {
   const { open, onOpenChange, settings, onCreated } = props;
   const { toast } = usePlugin();
 
-  const [form, setForm] = useState<CreateFormData>({
-    ...EMPTY_FORM,
-    license_college: settings.defaultCollege,
-  });
+  const [form, setForm] = useState<CreateFormData>({ ...EMPTY_FORM });
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<string, string>>>({});
 
@@ -76,9 +70,8 @@ function CreateProfessionalDialog(props: {
   const validate = useCallback((): boolean => {
     const errs: Partial<Record<string, string>> = {};
     if (!form.name.trim()) errs.name = 'El nombre es obligatorio';
-    if (!form.license_number.trim()) errs.license_number = 'La matricula es obligatoria';
-    if (settings.senasaEnabled && settings.senasaRequired && !form.senasa_number.trim()) {
-      errs.senasa_number = 'El numero SENASA es obligatorio';
+    if (settings.showLicense && !form.license_number.trim()) {
+      errs.license_number = 'La matricula es obligatoria';
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -105,7 +98,7 @@ function CreateProfessionalDialog(props: {
       const staffMembers = await actions.execute<Array<{ id: string }>>('staff.members.create', {
         data: {
           contact_id: contactId,
-          role: 'veterinario',
+          role: DEFAULT_STAFF_ROLE,
           is_active: form.is_active,
         },
       });
@@ -116,16 +109,19 @@ function CreateProfessionalDialog(props: {
       await actions.execute('vet-staff.professionals.create', {
         data: {
           staff_id: staffId,
-          license_number: form.license_number.trim(),
-          license_college: form.license_college.trim() || null,
-          specialty: form.specialties.length > 0 ? form.specialties.join(',') : null,
-          senasa_number: form.senasa_number.trim() || null,
+          license_number: settings.showLicense ? form.license_number.trim() : '',
+          license_college: settings.showLicense ? form.license_college.trim() || null : null,
+          specialty:
+            settings.showSpecialty && form.specialties.length > 0
+              ? form.specialties.join(',')
+              : null,
+          senasa_number: settings.showSenasa ? form.senasa_number.trim() || null : null,
           is_active: form.is_active,
         },
       });
 
       toast.success('Creado', `${form.name.trim()} registrado como profesional`);
-      setForm({ ...EMPTY_FORM, license_college: settings.defaultCollege });
+      setForm({ ...EMPTY_FORM });
       setErrors({});
       onOpenChange(false);
       onCreated();
@@ -138,11 +134,11 @@ function CreateProfessionalDialog(props: {
 
   const handleClose = useCallback(() => {
     if (!saving) {
-      setForm({ ...EMPTY_FORM, license_college: settings.defaultCollege });
+      setForm({ ...EMPTY_FORM });
       setErrors({});
       onOpenChange(false);
     }
-  }, [saving, settings, onOpenChange]);
+  }, [saving, onOpenChange]);
 
   return h(
     UI.FormDialog,
@@ -177,26 +173,33 @@ function CreateProfessionalDialog(props: {
         onPhoneChange: (v: string) => updateField('phone', v),
       }),
 
-      h(UI.Separator, null),
+      // Datos profesionales (condicional por settings)
+      settings.showLicense || settings.showSpecialty || settings.showSenasa
+        ? h(UI.Separator, null)
+        : null,
 
-      // Datos profesionales
-      h(LicenseFields, {
-        licenseNumber: form.license_number,
-        licenseCollege: form.license_college,
-        licenseError: errors.license_number,
-        onLicenseNumberChange: (v: string) => updateField('license_number', v),
-        onLicenseCollegeChange: (v: string) => updateField('license_college', v),
-      }),
-      h(SpecialtiesField, {
-        values: form.specialties,
-        onValuesChange: (vals: string[]) => updateField('specialties', vals),
-      }),
-      h(SenasaField, {
-        settings,
-        value: form.senasa_number,
-        error: errors.senasa_number,
-        onChange: (v: string) => updateField('senasa_number', v),
-      }),
+      settings.showLicense
+        ? h(LicenseFields, {
+            licenseNumber: form.license_number,
+            licenseCollege: form.license_college,
+            licenseError: errors.license_number,
+            onLicenseNumberChange: (v: string) => updateField('license_number', v),
+            onLicenseCollegeChange: (v: string) => updateField('license_college', v),
+          })
+        : null,
+      settings.showSpecialty
+        ? h(SpecialtiesField, {
+            values: form.specialties,
+            onValuesChange: (vals: string[]) => updateField('specialties', vals),
+          })
+        : null,
+      settings.showSenasa
+        ? h(SenasaField, {
+            value: form.senasa_number,
+            error: errors.senasa_number,
+            onChange: (v: string) => updateField('senasa_number', v),
+          })
+        : null,
 
       h(UI.Separator, null),
 
@@ -270,9 +273,14 @@ export function ProfesionalesView() {
     [setSort]
   );
 
-  // Columnas
-  const columns = useMemo(
-    () => [
+  // Columnas (condicional por settings)
+  const columns = useMemo(() => {
+    const cols: Array<{
+      key: string;
+      header: string;
+      sortable?: boolean;
+      render: (p: VetProfessional) => unknown;
+    }> = [
       {
         key: 'staff_name',
         header: 'Profesional',
@@ -284,7 +292,10 @@ export function ProfesionalesView() {
             showStatus: false,
           }),
       },
-      {
+    ];
+
+    if (settings.showSpecialty) {
+      cols.push({
         key: 'specialty',
         header: 'Especialidad',
         sortable: true,
@@ -303,8 +314,11 @@ export function ProfesionalesView() {
             )
           );
         },
-      },
-      {
+      });
+    }
+
+    if (settings.showLicense) {
+      cols.push({
         key: 'license_number',
         header: 'Matricula',
         sortable: true,
@@ -312,11 +326,7 @@ export function ProfesionalesView() {
           h(
             'div',
             null,
-            h(
-              'span',
-              { className: 'font-medium text-sm' },
-              `${settings.licensePrefix} ${p.license_number}`
-            ),
+            h('span', { className: 'font-medium text-sm' }, p.license_number),
             p.license_college
               ? h(
                   'div',
@@ -325,21 +335,23 @@ export function ProfesionalesView() {
                 )
               : null
           ),
-      },
-      {
-        key: 'is_active',
-        header: 'Estado',
-        sortable: true,
-        render: (p: VetProfessional) =>
-          h(
-            UI.Badge,
-            { variant: p.is_active ? 'success-soft' : ('secondary' as string), size: 'sm' },
-            p.is_active ? 'Activo' : 'Inactivo'
-          ),
-      },
-    ],
-    [settings.licensePrefix]
-  );
+      });
+    }
+
+    cols.push({
+      key: 'is_active',
+      header: 'Estado',
+      sortable: true,
+      render: (p: VetProfessional) =>
+        h(
+          UI.Badge,
+          { variant: p.is_active ? 'success-soft' : ('secondary' as string), size: 'sm' },
+          p.is_active ? 'Activo' : 'Inactivo'
+        ),
+    });
+
+    return cols;
+  }, [settings.showSpecialty, settings.showLicense]);
 
   // Mobile render
   const mobileRender = useCallback(
@@ -351,21 +363,20 @@ export function ProfesionalesView() {
         h(
           'div',
           { className: 'flex items-center gap-2 mt-1' },
-          p.specialty
+          settings.showSpecialty && p.specialty
             ? h(
                 UI.Badge,
                 { variant: 'warning-soft' as string, size: 'sm' },
                 formatSpecialty(p.specialty.split(',')[0])
               )
             : null,
-          h(
-            'span',
-            { className: 'text-xs', style: { color: 'var(--cg-text-muted)' } },
-            settings.licensePrefix +
-              ' ' +
-              p.license_number +
-              (p.license_college ? ' · ' + p.license_college : '')
-          )
+          settings.showLicense
+            ? h(
+                'span',
+                { className: 'text-xs', style: { color: 'var(--cg-text-muted)' } },
+                p.license_number + (p.license_college ? ' · ' + p.license_college : '')
+              )
+            : null
         ),
         !p.is_active
           ? h(
@@ -375,7 +386,7 @@ export function ProfesionalesView() {
             )
           : null
       ),
-    [settings.licensePrefix]
+    [settings.showSpecialty, settings.showLicense]
   );
 
   const statsHeader = h(UI.StatCardRow, {
@@ -405,16 +416,18 @@ export function ProfesionalesView() {
     [statusFilter, handleStatusFilter]
   );
 
-  const specialtySelectSlot = h(
-    UI.Select,
-    {
-      value: specialtyFilter,
-      onValueChange: handleSpecialtyFilter,
-      placeholder: 'Especialidad',
-      clearable: true,
-    },
-    ...SPECIALTIES.map((s) => h(UI.SelectItem, { key: s, value: s }, formatSpecialty(s)))
-  );
+  const specialtySelectSlot = settings.showSpecialty
+    ? h(
+        UI.Select,
+        {
+          value: specialtyFilter,
+          onValueChange: handleSpecialtyFilter,
+          placeholder: 'Especialidad',
+          clearable: true,
+        },
+        ...SPECIALTIES.map((s) => h(UI.SelectItem, { key: s, value: s }, formatSpecialty(s)))
+      )
+    : null;
 
   const openDialog = useCallback(() => setDialogOpen(true), []);
 
