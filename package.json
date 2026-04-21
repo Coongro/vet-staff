@@ -43,8 +43,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@coongro/staff": ">=0.1.0",
-    "@coongro/contacts": ">=0.1.0"
+    "@coongro/staff": ">=0.1.0"
   },
   "peerDependencies": {
     "@coongro/plugin-sdk": ">=0.1.0"
