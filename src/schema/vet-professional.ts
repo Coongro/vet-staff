@@ -17,7 +17,8 @@ export const vetProfessionalTable = pgTable('module_vet_staff_vet_professionals'
     .default(sql`now()`),
   updated_at: timestamp('updated_at', { mode: 'string' })
     .notNull()
-    .default(sql`now()`),
+    .default(sql`now()`)
+    .$onUpdate(() => new Date().toISOString()),
 });
 
 export type VetProfessionalRow = typeof vetProfessionalTable.$inferSelect;
