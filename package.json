@@ -1,6 +1,6 @@
 {
   "name": "@coongro/vet-staff",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "Bloque veterinario que extiende staff con datos profesionales: matrícula, especialidad y firma. Gestión de profesionales veterinarios.",
   "main": "dist/index.js",
