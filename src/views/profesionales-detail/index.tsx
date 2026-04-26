@@ -1,17 +1,16 @@
 import { getHostReact, getHostUI, usePlugin, actions } from '@coongro/plugin-sdk';
 
-import { useVetProfessional } from '../../hooks/useVetProfessional.js';
+import { useVetProfessional, type VetProfessionalDetail } from '../../hooks/useVetProfessional.js';
 import { useVetStaffSettings } from '../../hooks/useVetStaffSettings.js';
 import type { VetProfessional } from '../../types/vet-professional.js';
 
-import { DeleteConfirmation } from './DeleteConfirmation.js';
 import { DetailSkeleton } from './DetailSkeleton.js';
 import { EditProfessionalDialog } from './EditProfessionalDialog.js';
 import { ProfessionalDataDesktop, ProfessionalDataMobile } from './ProfessionalDataCard.js';
 import { ProfileCardDesktop } from './ProfileCardDesktop.js';
 import { ProfileCardMobile } from './ProfileCardMobile.js';
 import { SpecialtiesCard } from './SpecialtiesCard.js';
-import { BORDER_TOP, formatDateShort, useIsMobile } from './utils.js';
+import { formatDateShort, useIsMobile } from './utils.js';
 
 const React = getHostReact();
 const UI = getHostUI();
@@ -20,31 +19,15 @@ const h = React.createElement;
 
 // --- Timestamps (siempre visible) ---
 
-function TimestampsFooter(props: { createdAt: string; updatedAt: string; isMobile: boolean }) {
+function TimestampsFooter(props: { createdAt: string; updatedAt: string }) {
   return h(
-    'div',
-    {
-      style: {
-        display: 'flex',
-        flexDirection: props.isMobile ? ('column' as const) : ('row' as const),
-        gap: props.isMobile ? 4 : 24,
-        fontSize: 12,
-        padding: '12px 0',
-        color: 'var(--cg-text-muted)',
-        borderTop: BORDER_TOP,
-      },
-    },
+    UI.Card,
+    { className: 'p-4 w-fit' },
     h(
       'div',
-      { style: { display: 'flex', alignItems: 'center', gap: 6 } },
-      h(UI.DynamicIcon, { icon: 'Clock', size: 12 }),
-      'Registrado: ' + formatDateShort(props.createdAt)
-    ),
-    h(
-      'div',
-      { style: { display: 'flex', alignItems: 'center', gap: 6 } },
-      h(UI.DynamicIcon, { icon: 'RefreshCw', size: 12 }),
-      'Actualizado: ' + formatDateShort(props.updatedAt)
+      { className: 'flex flex-col gap-1 text-xs text-cg-text-muted' },
+      h('span', null, 'Creado: ' + formatDateShort(props.createdAt)),
+      h('span', null, 'Actualizado: ' + formatDateShort(props.updatedAt))
     )
   );
 }
@@ -64,8 +47,18 @@ function DetailHeader(props: { onBack: () => void; onEdit: () => void; onDelete:
     h(
       'div',
       { className: 'flex gap-2 flex-shrink-0' },
-      h(UI.Button, { variant: 'outline', size: 'sm', onClick: props.onEdit }, 'Editar'),
-      h(UI.Button, { variant: 'destructive', size: 'sm', onClick: props.onDelete }, 'Eliminar')
+      h(
+        UI.Button,
+        { variant: 'outline', size: 'sm', onClick: props.onEdit },
+        h(UI.DynamicIcon, { icon: 'Pencil', size: 14 }),
+        'Editar'
+      ),
+      h(
+        UI.Button,
+        { variant: 'destructive', size: 'sm', onClick: props.onDelete },
+        h(UI.DynamicIcon, { icon: 'Trash2', size: 14 }),
+        'Eliminar'
+      )
     )
   );
 }
@@ -130,21 +123,31 @@ function ProfessionalDetail(props: {
     onDelete: () => setConfirmDelete(true),
   });
 
-  const deleteConfirm = confirmDelete
-    ? h(DeleteConfirmation, {
-        name: data.staff_name ?? 'Desconocido',
-        deleting,
-        onCancel: () => setConfirmDelete(false),
-        onConfirm: () => void handleDelete(),
-      })
-    : null;
+  const deleteConfirm = h(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (UI as any).ConfirmDialog,
+    {
+      open: confirmDelete,
+      onOpenChange: setConfirmDelete,
+      title: 'Eliminar profesional',
+      description: h(
+        React.Fragment,
+        null,
+        '¿Eliminar a ',
+        h('strong', null, data.staff_name ?? 'Desconocido'),
+        '? Se eliminará el registro profesional. El contacto y empleado se mantienen.'
+      ),
+      confirmLabel: 'Eliminar',
+      loading: deleting,
+      onConfirm: () => void handleDelete(),
+    }
+  );
 
   const showDataCard = settings.showLicense || settings.showSenasa;
   const hasRightColumn = showDataCard || settings.showSpecialty;
   const timestamps = h(TimestampsFooter, {
     createdAt: data.created_at,
     updatedAt: data.updated_at,
-    isMobile,
   });
 
   if (isMobile) {
@@ -206,7 +209,7 @@ export function ProfesionalesDetailView(props: { professionalId?: string }) {
   const professionalId =
     props.professionalId ?? (views.params as Record<string, string>)?.professionalId;
 
-  const [editTarget, setEditTarget] = useState<VetProfessional | null>(null);
+  const [editTarget, setEditTarget] = useState<VetProfessionalDetail | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const goToList = useCallback(() => {
