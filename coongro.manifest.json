@@ -96,7 +96,7 @@
             {
               "key": "vet-staff.fields.senasa",
               "type": "boolean",
-              "label": "SENASA",
+              "label": "N° de acreditación SENASA",
               "description": "Mostrar campo de acreditacion SENASA en formularios y detalle",
               "default": false,
               "tags": [

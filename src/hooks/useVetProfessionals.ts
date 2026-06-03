@@ -123,9 +123,15 @@ export function useVetProfessionals(options: UseVetProfessionalsOptions = {}) {
       );
     }
 
-    // Filtro por especialidad
+    // Filtro por especialidad (specialty es CSV: un profesional puede tener varias)
     if (filters.specialty) {
-      filtered = filtered.filter((p) => p.specialty === filters.specialty);
+      const wanted = filters.specialty;
+      filtered = filtered.filter((p) =>
+        p.specialty
+          ?.split(',')
+          .map((s) => s.trim())
+          .includes(wanted)
+      );
     }
 
     // Filtro por estado
