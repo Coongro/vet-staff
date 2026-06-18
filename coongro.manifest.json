@@ -13,11 +13,7 @@
       {
         "path": "Personal",
         "icon": "assets/icons/staff.svg",
-        "color": "#8B5CF6"
-      },
-      {
-        "path": "Personal/Profesionales",
-        "order": 1,
+        "color": "#8B5CF6",
         "viewId": "vet-staff.profesionales.open"
       }
     ],
@@ -55,7 +51,7 @@
           "id": "vet-staff.fields",
           "group": "vet-staff",
           "label": "Campos visibles",
-          "icon": "assets/icons/general.svg",
+          "icon": "assets/icons/staff.svg",
           "order": 10
         }
       ],
