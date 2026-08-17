@@ -35,7 +35,14 @@
       {
         "module": "./dist/repositories/vet-professional.repository.js",
         "export": "VetProfessionalRepository",
-        "prefix": "vet-staff.professionals"
+        "prefix": "vet-staff.professionals",
+        "actions": [
+          "list",
+          "getById",
+          "create",
+          "update",
+          "delete"
+        ]
       }
     ],
     "settings": {
